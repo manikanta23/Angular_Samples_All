@@ -1,0 +1,113 @@
+﻿<ul class="nav nav-tabs tabs-link-list searchpage-tab" role="tablist" id="vendorSearchTabs">
+    <li role="presentation" class="active">
+        <a href="#{{'pnlVendorSearch' + randomNumber}}" role="tab" data-toggle="tab" class="hyperlink" (click)="onTabClick(false)">
+            Vendor Number
+        </a>
+    </li>
+    <div class="adv-search-link-container"></div>
+    <li role="presentation">
+        <a href="#{{'pnlAdvancedVendorSearch' + randomNumber}}" role="tab" data-toggle="tab" class="hyperlink" (click)="onTabClick(true)">
+            Advanced Vendor Search
+        </a>
+    </li>
+    <div class="adv-search-link-container"></div>
+    <li>
+        <a class="hyperlink view-favorites" role="button" data-toggle="modal" data-target="#favoriteVendorsModal" (click)="viewFavorites()" style="padding-top: 10px;">View favorite Vendors</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="{{'pnlVendorSearch' + randomNumber}}">
+        <div class="form-group">
+            <input type="text" class="form-control" id="txtVendorNumber" #txtVendorNumber name="txtVendorNumber" [(ngModel)]="vendorNumber" [required]="!isDefaultVendorChecked" maxlength="10" (keypress)="onVendorKeypress($event)" (keydown)="onVendorKeydown($event)" placeholder="Vendor number"/>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <button type="button" style="margin-top:-1px;" class="btn btn-default yellow-btn btn-width-160" (click)="vendorSearch()" [disabled]="!vendorNumber">Search Vendor</button>
+            </div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="{{'pnlAdvancedVendorSearch' + randomNumber}}">
+        <div id="sapCustForm">
+            <h5>Provide any of the following information to find vendors</h5>
+            <div class="form-group">
+                <input class="form-control" id="advVendorName" name="advVendorName" placeholder="Vendor Name" type="text" [(ngModel)]="advVendorName" (keypress)="onVendorNameKeypress($event)">
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advVendorCity" name="advVendorCity" placeholder="City" type="text" [(ngModel)]="advVendorCity" (keypress)="onCityKeypress($event)">
+                </div>
+                <div class="form-group col-md-6">
+                    <select class="form-control" id="advVendorState" name="advVendorState" [(ngModel)]="advVendorState" (keypress)="onStateKeypress($event)">
+                        <option value="">State</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="AR">Arkansas</option>
+                        <option value="CA">California</option>
+                        <option value="CO">Colorado</option>
+                        <option value="CT">Connecticut</option>
+                        <option value="DE">Delaware</option>
+                        <option value="FL">Florida</option>
+                        <option value="GA">Georgia</option>
+                        <option value="HI">Hawaii</option>
+                        <option value="ID">Idaho</option>
+                        <option value="IL">Illinois</option>
+                        <option value="IN">Indiana</option>
+                        <option value="IA">Iowa</option>
+                        <option value="KS">Kansas</option>
+                        <option value="KY">Kentucky</option>
+                        <option value="LA">Louisiana</option>
+                        <option value="ME">Maine</option>
+                        <option value="MD">Maryland</option>
+                        <option value="MA">Massachusetts</option>
+                        <option value="MI">Michigan</option>
+                        <option value="MN">Minnesota</option>
+                        <option value="MS">Mississippi</option>
+                        <option value="MO">Missouri</option>
+                        <option value="MT">Montana</option>
+                        <option value="NE">Nebraska</option>
+                        <option value="NV">Nevada</option>
+                        <option value="NH">New Hampshire</option>
+                        <option value="NJ">New Jersey</option>
+                        <option value="NM">New Mexico</option>
+                        <option value="NY">New York</option>
+                        <option value="NC">North Carolina</option>
+                        <option value="ND">North Dakota</option>
+                        <option value="OH">Ohio</option>
+                        <option value="OK">Oklahoma</option>
+                        <option value="OR">Oregon</option>
+                        <option value="PA">Pennsylvania</option>
+                        <option value="RI">Rhode Island</option>
+                        <option value="SC">South Carolina</option>
+                        <option value="SD">South Dakota</option>
+                        <option value="TN">Tennessee</option>
+                        <option value="TX">Texas</option>
+                        <option value="UT">Utah</option>
+                        <option value="VT">Vermont</option>
+                        <option value="VA">Virginia</option>
+                        <option value="WA">Washington</option>
+                        <option value="DC">Washington DC</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WY">Wyoming</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advVendorPostalCode" name="advVendorPostalCode" placeholder="Postal Code" type="text" [(ngModel)]="advVendorPostalCode" (keypress)="onPostalCodeKeypress($event)">
+                </div>
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advVendorPhoneNumber" name="advVendorPhoneNumber" placeholder="Phone Number" type="text" [(ngModel)]="advVendorPhoneNumber" (keypress)="onPhoneNoKeypress($event)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-12">
+                    <button class="btn btn-default yellow-btn btn-width-160" style="margin-top:-1px;" type="button" id="btnAdvanceCustomerSearch" [disabled]="!advVendorName && !advVendorCity && !advVendorState && !advVendorPostalCode && !advVendorPhoneNumber" (click)="vendorSearch()">Search Vendor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="color:red;" id="errorMessage" *ngIf="hasMessage">{{vendorMesssage}}</span>

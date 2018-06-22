@@ -1,0 +1,108 @@
+﻿<!--Part buyout Popup -->
+<div class="modal fade bs-example-modal-md" id="partBuyoutModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Parts Buyout</h4>
+            </div>
+            <div class="modal-body" style="overflow:auto; min-height: 425px;padding: 0px 0 15px 0;">
+                <div id="divPartBuyout" class="partsbuyout  col-md-10 col-md-offset-1">
+                    <form>
+                        <!--Vendor Start-->
+                        <div class="cust-form-holder" *ngIf="!isVendorSelected">
+                            <div class="form-inline">
+                                <label class="sub-title part-buyout-subtitle">Vendor</label>
+                            </div>
+                            <vendor-panel #vendorPanel (callbackVendorSelect)="onVendorSelect($event,vendor)"></vendor-panel>
+                        </div>
+                        <!--selected Vendor details start-->
+                        <div class="cust-form-holder" *ngIf="isVendorSelected">
+                            <div class="form-inline">
+                                <label class="sub-title part-buyout-subtitle">Vendor</label>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-6 padding-0 padding-b-15">
+                                <b class="ellipsisText" title="{{vendor.name}}">{{vendor.name}}</b>
+                                <span class="ellipsisText" title="{{vendor.name2}}" *ngIf="vendor.name2!='' && vendor.name2!=' '">{{vendor.name2}}<br /></span>
+                                <span *ngIf="vendor.number!='' && vendor.number!=' '">{{vendor.number | customerNumberFilter}}<br /></span>
+                                <span class="ellipsisText" title="{{vendor.address}}" *ngIf="vendor.address!='' && vendor.address!=' '">{{vendor.address}}<br /></span>
+                                <span class="ellipsisText" title="{{vendor.city==null?'': vendor.city+','}} {{vendor.state}} {{vendor.zipCode}}" *ngIf="(vendor.city!='' && vendor.city!=' ') || (vendor.state!='' && vendor.state!=' ') || (vendor.zipCode!='' && vendor.zipCode!=' ')">{{vendor.city==null?'': vendor.city+','}} {{vendor.state}} {{vendor.zipCode}}<br /></span>
+                                <span *ngIf="vendor.phone!='' && vendor.phone!=' '">{{vendor.phone}}<br /></span>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-6 padding-0 padding-b-15">
+                                <b>
+                                    <a role="button" class="hyperlink" (click)="addToFavouriteVendors(vendor);" *ngIf="!vendor.isFavourite">Add '{{vendor.name}}' to Favorites</a>
+                                    <a role="button" class="hyperlink" (click)="removeFavouriteVendors(vendor);" *ngIf="vendor.isFavourite">Remove '{{vendor.name}}' from Favorites</a>
+                                </b>
+                                <br>
+                                <br>
+                                <b><a role="button" class="hyperlink" (click)="useDifferentVendor();">Use a different vendor</a></b>
+                            </div>
+                        </div>
+                        <!--selected Vendor details end-->
+                        <!--Vendor End-->
+                        <div class="form-group">
+                            <input id="txtpartNo" class="form-control" type="text" [(ngModel)]="partNo" name="partNo" readonly="readonly" tabindex="-1">
+                        </div>
+                        <div class="form-group full-width">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input id="txtpartNoOnly" class="form-control" type="text" [(ngModel)]="partNoOnly" name="partNoOnly" placeholder="Part Number" maxlength="40">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input id="txtManufacturer" class="form-control" type="text" [(ngModel)]="manufacturer" name="manufacturer" placeholder="Manufacturer" maxlength="40">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input id="txtBuyoutAmount" #txtBuyoutAmount class="form-control " type="text" [(ngModel)]="buyoutAmount" name="buyoutAmount" placeholder="Buyout Price" (keypress)="priceKeyPress($event)" (paste)="buyoutPriceOnPaste($event)" (focusout)="buyoutCorrectPrice(txtBuyoutAmount.value)" maxlength="14">
+                                </div>
+                                <div class="col-sm-6">
+                                    <input id="txtPrice" #txtPrice class="form-control" type="text" [(ngModel)]="price" name="price" placeholder="Sales Price" (keypress)="priceKeyPress($event)" (paste)="priceOnPaste($event)" (focusout)="correctPrice(txtPrice.value)" maxlength="14">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input id="txtDescription" class="form-control" type="text" [(ngModel)]="description" name="description" placeholder="Description" maxlength="40">
+                        </div>
+                        <div class="form-group full-width">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <select id="ddlPartBuyoutCoreOption" name="ddlPartBuyoutCoreOption" class="form-control" [ngModel]="selectedPartBuyoutCoreOption" (ngModelChange)="onChangePartBuyout($event)" #partBuyoutCoreOption>
+                                        <option selected value="">No Core for Part</option>
+                                        <option value="NOCORE">No Core Returned</option>
+                                        <option value="NICORE">Non-Inventory Core</option>
+                                        <option value="NICORER">Non-Inventory Core w/ Return</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="input-group spinner">
+                                        <div class="range-text-box" style="padding-right: 0%;">
+                                            <input class="form-control pull-left right-text-align" type="text" placeholder="Quantity" name="partsbuyoutQuantity" id="partsbuyoutQuantity" [(ngModel)]="partsbuyoutQuantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity($event)" autocomplete="off" (focusout)="onQuantityFocusout($event);"/>
+                                            <div class="renge-top" (click)="partsbuyoutQuantity=partsbuyoutQuantity+1">&nbsp;</div>
+                                            <div class="renge-down" (click)="partsbuyoutQuantity=partsbuyoutQuantity>1?partsbuyoutQuantity-1:1">&nbsp;</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="right-text-align">
+                                <button type="button" class="btn btn-md black-text btnBg yellow-btn" id="btnSubmitpartBuyout" [disabled]="!isVendorSelected ||( !partNoOnly && !description && !manufacturer && !price)" (click)="addToCart(partNo,partNoOnly,description,manufacturer,price,partsbuyoutQuantity,partBuyoutCoreOption.value)">SUBMIT</button>
+                                <button type="button" class="btn btn-md black-text btnBg margin-l-r-5 yellow-btn" id="btnCancelSubmitpartBuyout" [disabled]="!partNoOnly && !description && !manufacturer && !price" (click)="CancelPartBuyout()">CLEAR</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div [hidden]="isVendorSelected" class="alert alert-danger">
+                        <div [hidden]="isVendorSelected">Vendor is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end Part buyout -->

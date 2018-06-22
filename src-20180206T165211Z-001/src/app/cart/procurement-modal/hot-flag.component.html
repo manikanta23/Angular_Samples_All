@@ -1,0 +1,84 @@
+﻿<!-- HotFlag Popup -->
+<div class="modal fade bs-example-modal-md" id="hotFlagModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-rocket" aria-hidden="true"></i> HotFlag</h4>
+                    </div>
+
+                    <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                        <input type="text" id="searchFavouriteId" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search…">
+                        <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+
+                <div class="modal-body" style="width: 100%; padding:0;">
+                    <div style="min-height: 200px; max-height: 450px; overflow-y: auto; overflow-x:hidden; width: 100%;">
+                        <div id="divProcurement" style="margin-top: -19px;">
+
+                            <form #HotFlagForm="ngForm">
+
+                                <accordion [showArrows]="false" [closeOthers]="true">
+                                    <accordion-group (onToggle)="onToggleAccordion(cartItem)" *ngFor="let cartItem of filteredCartItems;let i=index">
+                                        <accordion-heading>
+                                            <div class="col-sm-1">
+                                                <accordion-toggle>
+                                                    <i class="fa fa-plus" style="cursor:pointer" *ngIf="!cartItem.isOpened" aria-hidden="true"></i>
+                                                    <i class="fa fa-minus" style="cursor:pointer" *ngIf="cartItem.isOpened" aria-hidden="true"></i>
+                                                </accordion-toggle>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <span *ngIf="cartItem.hotFlagCode==null ||cartItem.hotFlagCode==undefined || cartItem.hotFlagCode==''" class="redText margin-r-5"><i title="HotFlag is required." class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                                                <b>Part Number:</b>
+                                                {{cartItem.partNumber}}
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <b>Vendor Number:</b>
+                                                <span *ngIf="cartItem.vendorCode">{{cartItem.vendorCode| customerNumberFilter}}</span>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <a role="button" (click)="removeCartItem(cartItem);"><i class="fa fa-times pull-right" style="color:#f72727;" aria-hidden="true"></i></a>
+                                            </div>
+                                        </accordion-heading>
+
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label">Select:</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-control" id="{{'cartItemHotFlag_' + i}}" name="{{'cartItemHotFlag_' + i}}" [(ngModel)]="cartItem.hotFlagCode" required>
+                                                        <option value="" [selected]="cartItem.hotFlagCode==null ||cartItem.hotFlagCode==undefined || cartItem.hotFlagCode==''">Please Select Hot Flag</option>
+                                                        <option value="{{flag.code}}" *ngFor="let flag of hotFlags;" [selected]="cartItem.hotFlagCode==flag.code">{{flag.code+" - "+ flag.description}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </accordion-group>
+                                </accordion>
+                            </form>
+                            <div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-md black-text btnBg yellow-btn full-width" id="btnSendHotFlag" [disabled]="!HotFlagForm.form.valid" (click)="updateCartItemsHotFlag();">Send HotFlag</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div [hidden]="HotFlagForm.form.valid" class="alert alert-danger full-width margin-t-10 ">
+                                    <div [hidden]="HotFlagForm.form.valid">HotFlag is required.</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end HotFlag Popup-->

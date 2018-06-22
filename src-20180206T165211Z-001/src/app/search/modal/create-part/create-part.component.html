@@ -1,0 +1,108 @@
+﻿<!--Create Part Module Box Start -->
+<div class="modal fade bs-example-modal-lg" id="createPartModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title pull-left" id="myModalLabel"><i class="fa fa-info-circle" aria-hidden="true" style="margin: -3px 5px 0 5px;"></i>Select the Part below that you would like to create.</h4>
+                <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                    <input type="text" class="form-control customer-search-textbox" placeholder="Search ..." [(ngModel)]="filterKey" (keyup)="filter()" />
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                </div>
+
+            </div>
+            <div class="modal-body customer-table">
+                <table class="table" *ngIf="!hasMessage">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a role="button" (click)="sortDataBy('materialNumber');">
+                                    Part Number
+                                    <span [hidden]="sortBy != 'materialNumber'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'materialNumber' && sortAsc, 'fa-caret-down': sortBy == 'materialNumber' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('materialDescription');">
+                                    Description
+                                    <span [hidden]="sortBy != 'materialDescription'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'materialDescription'&& sortAsc, 'fa-caret-down': sortBy == 'materialDescription' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('manufacturerNumber');">
+                                    Manufacturer
+                                    <span [hidden]="sortBy != 'manufacturerNumber'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'manufacturerNumber'&& sortAsc, 'fa-caret-down': sortBy == 'manufacturerNumber' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('priceTapeIndicator');">
+                                    Price Tape
+                                    <span [hidden]="sortBy != 'priceTapeIndicator'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'priceTapeIndicator'&& sortAsc, 'fa-caret-down': sortBy == 'priceTapeIndicator' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('supersededPartNo');">
+                                    Superseded Part Number
+                                    <span [hidden]="sortBy != 'supersededPartNo'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'supersededPartNo'&& sortAsc, 'fa-caret-down': sortBy == 'supersededPartNo' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('informationText');">
+                                    Information Text
+                                    <span [hidden]="sortBy != 'informationText'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'informationText'&& sortAsc, 'fa-caret-down': sortBy == 'informationText' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let multiplePartResults of createPartResults " (click)="onPartNoSelect(multiplePartResults);">
+
+                            <td scope="row">
+                                <span>{{multiplePartResults.materialNumber}}<br /></span>
+                            </td>
+                            <td>
+                                <span>{{multiplePartResults.materialDescription}}<br /></span>
+                            </td>
+                            <td>{{multiplePartResults.manufacturerNumber}}</td>
+                            <td>{{multiplePartResults.priceTapeIndicator}}</td>
+                            <td>
+                                <span>{{multiplePartResults.supersededPartNo}}<br /></span>
+                            </td>
+                            <td>{{multiplePartResults.informationText}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Create Part Module Box End -->
+

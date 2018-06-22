@@ -1,0 +1,186 @@
+﻿
+<div class="modal-dialog modal-lg" role="dialog">
+
+    <div class="modal-content">
+        <div class="modal-header heading-users">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+            <!--<h4 class="modal-title" id="myModalLabel">User Details</h4>-->
+            <div class="title-of-box-hold">
+                <div class="title-of-box pull-left">
+                    User Details
+                </div>
+            </div>
+        </div>
+        <div class="modal-body" style="overflow:auto; min-height: 200px;padding: 0px 0 15px 0;">
+            <!-- User Details Start-->
+            <div id="divUserDetails" *ngIf="user && user !=null && user != undefined">
+                <form>
+                    <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                        <div class="col-sm-12 col-md-12 col-lg-12 left-area padding-25 heading-users" style="background-color:#FFF;">
+                            <div class="col-md-6 main-text-holder">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>User Type:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.userType != null ? user.userType.Name : 'Not available'}} <span *ngIf=" user.userType!=null && user.userType.isInternal">(Internal)</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>UserName:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.userName}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Customer Advisor Number:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.customerAdvisorNumber}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>First Name:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.firstName}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Last Name:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.lastName}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Email Address:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.emailAddress}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Default Branch:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.defaultBranchCode}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Job Title:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        {{user.jobTitle}}
+                                    </div>
+                                </div>
+                                <div class="row" *ngIf="user.id != null">
+                                    <div class="col-md-3">
+                                        <label>Default Branch Override:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <select class="form-control core-options" [(ngModel)]="user.overrideDefaultBranchCode" name="userDefaultBranchCodeOverride" #userDefaultBranchCodeOverride>
+                                            <option value="{{branch.code}}" *ngFor="let branch of branchOverrides">{{branch.code + ' - ' + branch.name}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>Is Active:</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="checkbox" style="margin-top: 0px !important;">
+                                            <input type="checkbox" id="user_isActive"
+                                                   name="user_isActive"
+                                                   class="form-control"
+                                                   [(ngModel)]="user.isActive" /> <!--(change)="updateUserDetails()"-->
+                                            <label for="user_isActive"><span><span></span></span> </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 main-text-holder">
+                                <br />
+                                <div class="form-group">
+                                    <label for="roles">Global Roles:</label>
+                                    <div class="checkbox" *ngFor="let role of roles; let i = index">
+                                        <input type="checkbox" id="{{'role_' + i}}"
+                                               class="form-control"
+                                               name="GlobalRoles"
+                                               [checked]="role.isAssigned"
+                                               (change)="updateCheckedRoles(role, $event)" />
+                                        <label for="{{'role_' + i}}"><span><span></span></span> {{role.name}}</label>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-9">
+                                            <label for="entityRoles">Entity Roles:</label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a (click)="syncUserWithSap($event)" class="hyperlink" role="button"><i class="fa fa-refresh"></i> Refresh</a>
+                                        </div>
+                                    </div>
+                                    <div class="user-entity-roles-table">
+                                        <div *ngFor="let entityRole of entityRoles" class="row">
+                                            <div class="col-md-4">
+                                                <label>{{entityRole.role.name}}:</label>
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{entityRole.entityName}}
+                                            </div>
+                                            <div class="col-md-2">
+                                                ({{entityRole.role.entityTypeId}})
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group pull-right">
+                            <button type="button" *ngIf="user.id != null" class="btn btn-default yellow-btn btn-width-160" (click)="updateUserDetails();">Update</button>
+                            <button type="button" *ngIf="user.id == null" class="btn btn-default yellow-btn btn-width-160" (click)="createUser();">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- User Details End-->
+            <!-- Create User Start-->
+            <div id="divCreateUser" *ngIf="!user || user ==null || user == undefined">
+                <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                    <div class="col-sm-12 col-md-12 col-lg-12 left-area padding-25 heading-users" style="background-color:#FFF;">
+                        <div class="col-md-12 main-text-holder">
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-10 col-md-6 col-lg-6">
+                                    <input type="text" class="form-control" placeholder="Search ..." [(ngModel)]="userSearchKey" (keypress)="searchUsersKeypress($event)" />
+                                    <span class="fa fa-search form-control-feedback" aria-hidden="true" style="margin:8px 10px !important"></span>
+                                </div>
+
+                                <button type="button" class="btn btn-default yellow-btn btn-width-160" (click)="searchUsers();">Search</button>
+                            </div>
+                            <div class="row" *ngIf="showMessage">
+                                <div class="col-sm-10 col-md-6 col-lg-6">
+                                    <h5>{{message}}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Create User End-->
+        </div>
+    </div>
+</div>

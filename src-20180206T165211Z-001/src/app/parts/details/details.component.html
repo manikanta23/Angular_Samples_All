@@ -1,0 +1,390 @@
+﻿<div class="row">
+    <div class="product-detils">
+        <div class="col-sm-12 col-md-12 col-lg-12 ">
+            <div class="right-area">
+                <div class="right-area-text">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-12 product-view-list product-details">
+
+                            <!--list-view-product-card Start-->
+                            <li class="product-card">
+                                <div class="col-sm-12 col-md-4 col-lg-4 padding-0 product-card-text">
+                                    <h1>
+                                        <span *ngIf="part.quantityAvailable<=0" style="color:gray">{{part.rushPartNumber}}</span>
+                                        <span *ngIf="part.quantityAvailable>0">{{part.rushPartNumber}}</span>
+                                        <a class="upload-icon" style="cursor:pointer" (click)="copyToClipBoard(part.rushPartNumber)"></a>
+                                    </h1>
+                                    <div class="product-images">
+                                        <img [src]="imageBaseUrl +'370X370/'+ part.image"
+                                             [default]="defaultImage"
+                                             alt="Smiley face" class="img-responsive">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12 col-md-8 col-lg-8" style="padding:0 5px; background: #eee;">
+
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li role="presentation" class="active"><a href="#details" aria-controls="details" role="tab" data-toggle="tab">Details</a></li>
+                                        <li role="presentation"><a href="#product_research" aria-controls="product_research" role="tab" data-toggle="tab">Product Research</a></li>
+                                        <li role="presentation">
+                                            <a href="#note" aria-controls="note" role="tab" data-toggle="tab">
+                                                Notes <span class="note-count" *ngIf="allNotes && sapCuratedNote">{{allNotes.length+1}}</span>
+                                                <span class="note-count" *ngIf="allNotes && !sapCuratedNote">{{allNotes.length}}</span>
+                                            </a>
+                                        </li>
+                                        <li role="presentation"><a href="#specification" aria-controls="specification" role="tab" data-toggle="tab">Specifications </a></li>
+                                    </ul>
+
+                                    <!-- Tab panes -->
+                                    <div class="tab-content product-details-tab">
+                                        <div role="tabpanel" class="tab-pane fade in active" id="details">
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-8 col-lg-8 detiles-product-tabs">
+                                                    <div class="col-md-12 padding-t-b-15 float-left">
+                                                        <h1 class="pull-left">{{part.description}}<sup>{{part.isReman?'REMAN':'NEW'}}</sup></h1>
+                                                        <span class="pull-right">
+                                                            <b>{{part.quantityAvailable}} Available</b><br />
+                                                            {{branchCode + '- ' + part.branchName}}<br />
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-md-12 padding-0 float-left">
+                                                        <h4>
+                                                            PART INFORMATION
+                                                        </h4>
+                                                        <div class="row">
+                                                            <div class="col-md-6" style="padding-right: 7px !important;">
+                                                                <b class="bold-20">VMRS DESCRIPTION</b>
+                                                                <p class="ptag-15" style="max-height: 55px; overflow-y: auto;">{{part.vmrsDescription}}</p>
+                                                            </div>
+                                                            <div class="col-md-6">
+
+                                                                <b class="bold-20">VMRS CODE</b>
+                                                                <p class="ptag-15">&nbsp;{{part.vmrsCode}}</p>
+                                                            </div>
+                                                            <div class="col-md-6" *ngIf="part.corePart">
+                                                                <b class="bold-20">CORE PART NO</b>
+                                                                <p class="ptag-15">{{part.corePart}}</p>
+                                                                <div class="col-lg-8 padding-0" *ngIf="part.corePrice>0">
+                                                                    <select class="form-control" #partdetailCoreOption (change)="partdetailCoreOptionChange(partdetailCoreOption.value)">
+                                                                        <option value="NOCORER">No Core Returned</option>
+                                                                        <option value="CORE1">Core Returned</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div *ngIf="part.binLocation" class="col-md-6">
+                                                                <b class="bold-20">BIN LOCATION</b>
+                                                                <p class="ptag-15">{{part.binLocation}}</p>
+                                                            </div>
+                                                            <div *ngIf="part.comments" class="col-md-6">
+                                                                <b class="bold-20">&nbsp;</b>
+                                                                <p class="ptag-15">Your search of &nbsp;{{part.comments}}</p>
+                                                            </div>
+
+                                                        </div>
+                                                        <!--<div class="row">
+                                                            <div class="col-md-6" *ngIf="part.supersededPartNumber">
+                                                                <b class="bold-20">SUPERSEDES PART #</b>
+                                                                <p class="ptag-15">
+                                                                    <a class="hyperlink" [routerLink]="['/parts']" [queryParams]="{searchTerm:part.supersededPartNumber}">
+                                                                        {{part.supersededPartNumber}}
+                                                                    </a>
+                                                                </p>
+                                                            </div>
+                                                            <div class="col-md-6" *ngIf="part.supersededByPartNumber">
+                                                                <b class="bold-20">SUPERSEDED BY PART #</b>
+                                                                <p class="ptag-15">
+                                                                    <a class="hyperlink" [routerLink]="['/parts']" [queryParams]="{searchTerm:part.supersededByPartNumber}">
+                                                                        {{part.supersededByPartNumber}}
+                                                                    </a>
+                                                                </p>
+                                                            </div>
+                                                        </div>-->
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-12 col-md-4 col-lg-4 peoduct-detiles-price product-tabs">
+                                                    <!--PRICE-->
+                                                    <!--<div class="product-price">-->
+                                                    <!--<b>UNIT PRICE</b>
+                                                        <span>$12345.67</span>
+                                                        <b>CORE PRICE</b>
+                                                        <span>$1234.56</span>
+                                                        <b>CORE PRICE</b>
+                                                        <input class="form-control pull-left" type="number">
+                                                        <div class="pull-left price-adj-inactive price-adj-active"></div>
+                                                        <button type="submit" class="btn btn-default yellow-btn btn-width-160 margin-t-10">Add to Cart</button>
+                                                        <a class="hyperlink pull-left margin-t-10" href="#">National Inventory</a>
+
+
+                                                    </div>-->
+                                                    <!--//PRICE-->
+
+                                                    <div style="width:155px; margin:0 auto;">
+                                                        <form #PriceAdjustmentForm="ngForm">
+                                                            <!--EDIT PRICE -->
+                                                            <div class="edit-price" *ngIf="isPriceAdjustmentActive">
+                                                                <b>Customer's Price</b>
+                                                                <div class="redText" *ngIf="part.isSpecialPricing">Special Sale Price</div>
+                                                                <span [ngClass]="part.isSpecialPricing? 'form-control pull-left redText':'form-control pull-left'">{{part.listPrice == null ? "0" : part.listPrice | currency:'USD': true:'1.2-2'}}</span>
+                                                                <b>Adjusted Price</b>
+                                                                <input class="form-control pull-left" (click)="hidenotification()" type="text" #adjustedPrice="ngModel" id="adjustedPrice" name="adjustedPrice" pattern="-?(?:\d*\.)?\d+" required [(ngModel)]="decAdjustedPrice" autofocus>
+                                                                <b>Select Reason</b>
+                                                                <select class="form-control" #adjustedPriceReason id="adjustedPriceReason" name="adjustedPriceReason">
+                                                                    <option value="0">Competitive</option>
+                                                                    <option value="1">Incorrect in system</option>
+                                                                    <option value="2">Marketing</option>
+                                                                    <option value="3">Contract Price</option>
+                                                                </select>
+                                                                <button type="submit" class="btn btn-default yellow-btn margin-t-10" (click)="setAdjustedPrice(part,adjustedPrice.value,adjustedPriceReason.value)" [disabled]="!adjustedPrice.valid">Adjust Price</button>
+                                                                <button type="submit" class="btn btn-default black-btn margin-t-10" (click)="togglePricePanel()">Cancel</button>
+                                                            </div>
+                                                        </form>
+                                                        <!--//EDIT  PRICE-->
+                                                        <!--change PRICE-->
+                                                        <form #QuantityPriceForm="ngForm">
+                                                            <div class="product-price" *ngIf="!isPriceAdjustmentActive">
+                                                                <div class="product-price">
+                                                                    <b>CUSTOMER'S PRICE</b>
+                                                                    <div class="redText" *ngIf="part.isSpecialPricing">Special Sale Price</div>
+                                                                    <div *ngIf="part.adjustedPrice == null || part.adjustedPrice==0">
+                                                                        <span [ngClass]="part.isSpecialPricing? 'redText':''">
+                                                                            {{ ((part.isPriceVerified) ? part.verifiedPrice :(part.listPrice == null ? "0" : part.listPrice)) | currency:'USD': true:'1.2-2'}}
+                                                                            <a class="btn price-adj-inactive price-adj-active" (click)="togglePricePanel()"></a>
+                                                                            <a class="btn price-verify-icon" style="cursor:default" *ngIf="part.isPriceVerified">v</a>
+                                                                            <i class="fa fa-ticket coupon" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)" title="Part is eligible for coupon"></i>
+                                                                        </span>
+
+                                                                    </div>
+                                                                    <div class="change-price" *ngIf="part.adjustedPrice != null && part.adjustedPrice != 0">
+                                                                        <span>{{part.adjustedPrice | currency:'USD': true:'1.2-2'}}</span>
+                                                                        <span class="strikethrough" style="float:right; color: #111111 !important">
+                                                                            {{part.listPrice == null ? "0" : part.listPrice | currency:'USD': true:'1.2-2'}}
+                                                                            <a class="btn price-adj-inactive price-adj-active" (click)="togglePricePanel()"></a>
+                                                                            <a class="btn price-verify-icon" style="cursor:default" *ngIf="part.isPriceVerified">v</a>
+                                                                            <i class="fa fa-ticket coupon" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)" title="Part is eligible for coupon"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div><a role="button" class="switch-cart hyperlink" *ngIf="isMscOrFleetCustomer" (click)="showMscPriceVerifyPopup(part);">Price Verify for MSC or Fleet</a><i *ngIf="isMscOrFleetCustomer" class="fa fa-info-circle" aria-hidden="true" style="margin: -3px 5px 0 5px; position: relative; top: -4px;"></i></div>
+
+                                                                    <!--<b style="color:red">Dinoco filter $ 5% off </b>
+                                                                    <b>Coupon Price</b>
+                                                                    <span style="color:red">$27.37</span>-->
+                                                                    <div [ngClass]="{'hidden-visibility': (part.corePrice == null || part.corePrice <= 0)}">
+                                                                        <b>CORE PRICE</b>
+                                                                        <span class="core-price-amount">{{part.corePrice == null ? "0" : part.corePrice | currency:'USD': true:'1.2-2'}}</span>
+                                                                    </div>
+                                                                    <div class="couponRedText" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)">
+                                                                        <p class="ellipsisText" title="{{part.couponPartDetails[0].couponDescription}}">
+                                                                            {{part.couponPartDetails[0].couponDescription}}
+                                                                        </p>
+                                                                        <b class="redText">COUPON PRICE</b>
+                                                                        <span class="redText">
+                                                                            {{part.couponPartDetails[0].couponDiscountFlatAmount | currency:'USD': true:'1.2-2'}}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <b>Quantity</b>
+                                                                    <div class="range-text-box">
+                                                                        <input class="form-control pull-left right-text-align" type="text" id="txtQuantity" #txtQuantity name="txtQuantity" [(ngModel)]="part.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(part,$event)" (focusout)="onQuantityFocusout(part,$event);" />
+                                                                        <div class="renge-top" (click)="part.quantity=(part.quantity *1)+1">&nbsp;</div>
+                                                                        <div class="renge-down" (click)="part.quantity=(part.quantity *1)>1?(part.quantity *1)-1:1">&nbsp;</div>
+                                                                    </div>
+
+                                                                    <button type="submit" class="btn btn-default yellow-btn btn-width-160 margin-t-10" (click)="addToCart(part)">{{part.quantityAvailable > 0 ? "Add to Cart" : "Order"}}</button>
+                                                                    <a role="button" class="hyperlink pull-left margin-t-10" (click)="openNationalInventory(part)">National Inventory</a>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                        <!--// change PRICE-->
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane fade" id="product_research">
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 detiles-product-tabs product-tabs">
+                                                    <div class="col-md-12 padding-t-b-15 float-left">
+                                                        <h1 class="pull-left">{{part.description}}<sup>{{part.isReman?'REMAN':'NEW'}}</sup></h1>
+                                                        <span class="pull-right">
+                                                            <b>{{part.quantityAvailable}} Available</b><br>
+                                                            {{branchCode + '- ' + part.branchName}}
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-md-12 padding-0 float-left">
+                                                        <h4>
+                                                            Links
+                                                        </h4>
+                                                        <div class="col-sm-12 col-md-6 padding-0">
+                                                            <a href="https://eportal.paccar.com/" class="hyperlink" target="_blank">Paccar E-Portal</a>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6 padding-0">
+                                                            <a href="https://evalue.internationaldelivers.com/partsonline/" class="hyperlink" target="_blank">Navistar Parts</a>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6 padding-0">
+                                                            <a href="{{catalogSearchUrl +part.partNumberOnly}}" class="hyperlink" target="_blank">Search PDF Catalog</a>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6 padding-0">
+                                                            <a href="http://www.rushtruckcenters.com/PartsCatalog/ " class="hyperlink" target="_blank">Rush All Makes Parts Catalog</a>
+                                                        </div>
+                                                        <!--ToDo: made changes to hide this url because of this feature moved to MVP3 Enhancements, mainly due to multiple manufacturers -->
+                                                        <div class="col-sm-12 col-md-6 padding-0" style="display: none;">
+                                                            -1
+                                                            <a href="http://www.delcoremy.com" class="hyperlink" target="_blank">Manufacturer Portal</a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <!--<div class="col-sm-12 col-md-4 col-lg-4 peoduct-detiles-price pull-left">
+                                                    <div class="product-price">
+                                                        <b>UNIT PRICE</b>
+                                                        <span>{{part.listPrice == null ? "0" : part.listPrice | currency:'USD': true:'1.2-2'}}</span>
+                                                        <b>CORE PRICE</b>
+                                                        <span>{{part.corePrice == null ? "0" : part.corePrice | currency:'USD': true:'1.2-2'}}</span>
+                                                        <b>Quantity</b>
+                                                        <div class="range-text-box">
+                                                            <input class="form-control pull-left" type="text" value="1">
+                                                            <div class="renge-top">&nbsp;</div>
+                                                            <div class="renge-down">&nbsp;</div>
+                                                        </div>
+                                                        <div class="pull-left price-adj-inactive price-adj-active"></div>
+                                                        <button type="submit" class="btn btn-default yellow-btn btn-width-160 margin-t-10">Add to Cart</button>
+                                                        <a class="hyperlink pull-left margin-t-10" href="#">National Inventory</a>
+                                                    </div>
+
+                                                </div>-->
+                                            </div>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane fade float-left padding-0 fade product-tabs" id="note">
+
+                                            <div *ngIf="sapCuratedNote!=null && sapCuratedNote!='' && sapCuratedNote.length>0" class="col-sm-12 col-md-12 col-lg-12 customer-name-note padding-t-b-15" style="width:100%">
+                                                <b style="padding-left:15px">SAP Part Administrator Notes:</b>
+                                                <p style="padding-left:15px">{{sapCuratedNote}}</p>
+                                            </div>
+
+                                            <div class="col-sm-12 col-md-12 col-lg-12 customer-name-note padding-t-b-15">
+                                                <div class="col-sm-12 col-md-6 col-lg-6 ">
+                                                    Sort By:
+                                                    <span class="dropdown">
+                                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{noteSortDirection}} &nbsp;<span class="fa" [ngClass]="{'fa-caret-up': sortAsc, 'fa-caret-down': !sortAsc}"></span></a>
+                                                        <ul class="dropdown-menu pull-right">
+                                                            <li>
+                                                                <a role="button" (click)="sortDataBy('updatedDate', false);">Newest to Oldest</a>
+                                                            </li>
+                                                            <li>
+                                                                <a role="button" (click)="sortDataBy('updatedDate',true);">Oldest to Newest</a>
+                                                            </li>
+                                                        </ul>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-sm-12 col-md-12 col-lg-12 padding-0 padding-t-b-15 note-list" style="overflow-y:auto; min-height:120px; height:190px; width:100%;">
+                                                <ul>
+                                                    <li *ngFor="let note of allNotes">
+                                                        <span>{{note.updatedDate| date: 'MM/dd/yyyy'}} </span><span class="bold"></span>
+                                                        <p>{{note.description}}</p>
+                                                    </li>
+                                                </ul>
+
+                                            </div>
+                                            <div class="col-sm-12 col-md-12 col-lg-12 padding-t-b-10">
+                                                <div class="padding-0">
+                                                    <div class="pull-right padding-l-10">
+                                                        <button type="button" class="btn btn-primary black-btn" [disabled]="!description" (click)="createNotes();">Add Note</button>
+                                                    </div>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-addon" id="sizing-addon3"><i class="fa fa-paperclip" aria-hidden="true"></i></span>
+                                                        <input type="text" class="form-control" placeholder="Add a Note" [(ngModel)]="description" aria-describedby="sizing-addon3"><span class="fa fa-comment-o errspan"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div role="specification" class="tab-pane fade float-left padding-0 product-tabs" id="specification">
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 specifications-tab">
+                                                    <div class="col-sm-12 col-md-12 col-lg-12" *ngIf="partsData.parts[0].specification == null || partsData.parts[0].specification.length ==0 || partsData.parts[0].specification[0]=='' ">
+                                                        <h5>
+                                                            Specifications are not available.
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-12 padding-t-b-15 float-left">
+                                                        <div class="col-sm-12 col-md-12 col-lg-12" *ngIf="partsData.parts[0].specification != null && partsData.parts[0].specification.length > 0 && partsData.parts[0].specification[0]!='' ">
+                                                            <h1>
+                                                                Specifications
+                                                            </h1>
+                                                            <div *ngFor="let specItem of partsData.parts[0].specification">
+                                                                <div class="col-sm-12 col-md-6 col-lg-6 padding-0">
+                                                                    <p><span class="textGrey">{{specItem.split(':')[0]}}:<span class="textBlackBold">{{specItem.split(':')[1]}}</span></span></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <!--list-view-product-card End-->
+                        </div>
+                    </div>
+
+                    <div class="row relared-product" *ngIf="alternateParts == null && getAlternatesChecked == false">
+                        <h5 class="padding-l-15">loading alternate part(s) ...</h5>
+                    </div>
+
+                    <div class="row relared-product" *ngIf="relatedParts == null">
+                        <h5 class="padding-l-15">loading related part(s) ...</h5>
+                    </div>
+                    <div>
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs related-alternate-tab" role="tablist">
+                            <li role="presentation" class="active" *ngIf="relatedParts != null && relatedParts.parts.length > 0"><a href="#panelRelatedParts" aria-controls="panelRelatedParts" role="tab" data-toggle="tab">Related/Suggested Parts</a></li>
+                            <li role="presentation" *ngIf="alternateParts != null && alternateParts.parts != null && alternateParts.parts.length > 0"><a href="#panelAlternateParts" aria-controls="panelAlternateParts" role="tab" data-toggle="tab">Alternate Parts <span class="note-count">{{alternateParts.parts.length}}</span></a></li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane fade in active tab-panels" id="panelRelatedParts">
+                                <div class="row relared-product" *ngIf="relatedParts != null && relatedParts.parts.length > 0">
+                                    <div>
+                                        <alternate-related-parts [parts-data]="relatedParts" [detail-part]="partsData.parts[0]" [is-related-flag]="true" *ngIf="relatedParts.parts.length > 0"></alternate-related-parts>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" [ngClass]="{'tab-pane fade in active tab-panels': !relatedParts || relatedParts.parts.length <= 0,'tab-pane fade tab-panels':relatedParts != null && relatedParts.parts.length > 0}" id="panelAlternateParts">
+                                <div class="row relared-product" *ngIf="alternateParts != null && alternateParts.parts != null && alternateParts.parts.length > 0">
+                                    <div>
+                                        <alternate-related-parts [parts-data]="alternateParts" [detail-part]="partsData.parts[0]" [is-related-flag]="false" *ngIf="alternateParts.parts.length > 0"></alternate-related-parts>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Confirmation Price Adjustment-->
+<div class="modal fade bs-example-modal-sm" id="confirmationPriceAdjustment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <br />
+            <div class="modal-body customer-table">
+                {{this.priceAdjustmentMessage}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" data-dismiss="modal" (click)="onPriceAdjustmentConfirmationYes()">Yes</button>
+                <button type="button" class="btn yellow-btn" data-dismiss="modal" (click)="onPriceAdjustmentConfirmationNo()">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Confirmation Price Adjustment-->
+<!--Confirmation Price Verify-->
+<price-verify #priceVerify (callbackMscPriceVerified)="onMscPriceVerified($event,data)"></price-verify>
+<!--Confirmation Price Verify-->

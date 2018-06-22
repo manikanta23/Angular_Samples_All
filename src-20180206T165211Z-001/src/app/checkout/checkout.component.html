@@ -1,0 +1,339 @@
+﻿<div>
+    <div class="row">
+        <div class="search-text-holder">
+            <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                <div class="checkout-customer-header col-xs-12">
+                    <h2 style="font-size: 19px;">{{customerName}}</h2><h5>&nbsp;({{customerNumber | customerNumberFilter}})</h5>
+                </div>
+                <div class="col-sm-12 col-md-7 col-lg-7 left-area padding-b-25 heading-search" style="background-color:#FFF;">
+                    <div class="col-md-12 info">Provide the following information to complete and place your order.</div>
+                    <form #CheckoutForm="ngForm" class="col-sm-12 col-md-12 col-lg-12">
+                        <!--Billing Start-->
+                        <div></div>
+                        <div class="title-of-box-hold float-left">
+                            <div class="title-of-box pull-left">Billing</div>
+                        </div>
+                        <div class="search-holder float-left">
+                            <div class="cust-form-holder" style="margin: 0 8px 15px;">
+                                <div class="form-group form-inline radio_Check_box" *ngIf="!billingTypeCustomers">
+                                    {{billingMessage}}
+                                    <span class="countLoader"></span>
+                                </div>
+                                <div class="form-group form-inline radio_Check_box" *ngIf="billingTypeCustomers">
+                                    <div *ngFor="let item of billingTypeCustomers">
+                                        <input id="{{'radio' + item.addressNumber}}" type="radio" name="billingTypeOptions" #billingTypeOptions="ngModel" [(ngModel)]="defaultBillingType" (change)="onBillingTypeChange(item)" value="{{item.addressNumber}}" [attr.checked]="(item.payerNotValidInBranch == false && item.addressNumber == defaultBillingType)?'true':null" required [attr.disabled]="(item.payerNotValidInBranch)?'true':null" [attr.title]="(item.payerNotValidInBranch)?'Payer is not valid for this branch':null">
+                                        <label for="{{'radio' + item.addressNumber}}">
+                                            <span><span></span></span>
+                                            {{item.customerName}} ({{item.addressNumber }}) <label *ngIf="item.payerNotValidInBranch"> &nbsp; <i class="fa fa-exclamation-triangle warningIcon" aria-hidden="true"></i> Payer is not valid for this branch</label>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin: 0 12px 15px;">
+                                <label for="txtPONumber">PO Number </label> <span class="label label-danger" *ngIf="isPONumberRequired">REQUIRED</span>
+                                <input type="text" class="form-control" id="txtPONumber" name="txtPONumber" #txtPONumber="ngModel" [required]="isPONumberRequired" [(ngModel)]="PONumber" (ngModelChange)="setPONumber()" (keypress)="onCustomerKeypress($event)" (focusout)="updateUnitNOPOSI()" maxlength="20">
+                            </div>
+                            <div class="form-group" style="margin: 0 12px 15px;">
+                                <label for="txtUnitNumber">Unit Number</label>
+                                <input type="text" class="form-control" id="txtUnitNumber" name="txtUnitNumber" #txtUnitNumber="ngModel" [(ngModel)]="UnitNumber" (ngModelChange)="setUnitNumber()" pattern="^[\w\s]+$" (focusout)="updateUnitNOPOSI()" maxlength="20">
+                            </div>
+                        </div>
+                        <!--Billing End-->
+                        <!--Delivery Start-->
+                        <div class="title-of-box-hold float-left">
+                            <div class="title-of-box pull-left">Delivery</div>
+                        </div>
+                        <div class="search-holder float-left" style="margin: 0 8px 15px;">
+                            <div class="cust-form-holder" style="margin-bottom: 0;">
+
+                                <div class="form-group form-inline radio_Check_box" *ngIf="!cartsData && !delivery">
+                                    loading delivery options...
+                                    <span class="countLoader"></span>
+                                </div>
+                                <div class="form-group form-inline radio_Check_box" *ngIf="cartsData">
+                                    <div>
+                                        <input type="radio" id="radWillCall" name="deliveryOptions" #deliveryOptions="ngModel" [(ngModel)]="selectedDelivery" value="{{deliveryType[deliveryType.Pickup]}}" (change)="onDeliveryOptionChange(delivery,deliveryType[deliveryType.Pickup])" [checked]="selectedDelivery==deliveryType[deliveryType.Pickup]" required [attr.disabled]="(!cartsData || cartsData.length <= 0)?'true':null">
+                                        <label for="radWillCall">
+                                            <span><span></span></span>
+                                            Will Call
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" id="radRushTruckCentersDelivery" name="deliveryOptions" #deliveryOptions="ngModel" [(ngModel)]="selectedDelivery" value="{{deliveryType[deliveryType.Delivery]}}" (change)="onDeliveryOptionChange(delivery,deliveryType[deliveryType.Delivery])" [checked]="selectedDelivery==deliveryType[deliveryType.Delivery]" [attr.disabled]="(!cartsData || cartsData.length <= 0)?'true':null">
+                                        <label for="radRushTruckCentersDelivery">
+                                            <span><span></span></span>
+                                            Rush Truck Centers Delivery
+                                        </label>
+
+                                    </div>
+                                    <div>
+                                        <input type="radio" id="radFreightDelivery" name="deliveryOptions" #deliveryOptions="ngModel" [(ngModel)]="selectedDelivery" value="{{deliveryType[deliveryType.ShipTo]}}" (change)="onDeliveryOptionChange(delivery,deliveryType[deliveryType.ShipTo])" [checked]="selectedDelivery==deliveryType[deliveryType.ShipTo]" [attr.disabled]="(!cartsData || cartsData.length <= 0)?'true':null">
+                                        <label for="radFreightDelivery">
+                                            <span><span></span></span>
+                                            Freight Delivery
+                                        </label>
+                                    </div>
+                                </div>
+                                <!--<div [hidden]="!selectedDelivery && !selectedDelivery.errors && !selectedDelivery.errors.required">
+                                    Name is required
+                                </div>-->
+                            </div>
+                        </div>
+                        <!--Delivery End-->
+                        <!--Alternate Shipping Address Start-->
+                        <div class="title-of-box-hold float-left">
+                            <div class="title-of-box pull-left">Alternate Shipping Address</div>
+                        </div>
+                        <div class="form-group" style="margin: 0 10px 15px;" *ngIf="showAlternateShipingAddressLoader">
+                            loading alternate shipping address...
+                            <span class="countLoader"></span>
+                        </div>
+                        <div class="form-group" *ngIf="!isAlternateShipingAddressSelected && !showAlternateShipingAddressLoader">
+                            <button class="btn btn-default yellow-btn margin-t-10" type="button" (click)="getAlternateShippingCustomers()">Add Address</button>
+                        </div>
+                        <div class="search-holder float-left" style="margin: 0 0 15px;" *ngIf="isAlternateShipingAddressSelected">
+                            <div class="pull-right"><a role="button" class="hyperlink" (click)="selectDifferentAddress();">Select a Different Address</a></div>
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6 col-lg-6" *ngIf="!editAlternateAddressFlag">
+                                    <b>{{selectedAlternateShipingAddress.customerName}}</b><a role="button" class="hyperlink margin-l-r-10 " (click)="editAlternateAddressFlag = true;">Edit</a>
+                                    <br>{{selectedAlternateShipingAddress.streetAddress}}
+                                    <br>{{selectedAlternateShipingAddress.city}},
+                                    <br>{{selectedAlternateShipingAddress.state+" "+selectedAlternateShipingAddress.postalCode +" "+selectedAlternateShipingAddress.phoneNumber}}
+                                    <br />
+                                    <br /> MSC Account # {{selectedAlternateShipingAddress.mscAccountNumber}}
+                                    <br /> Salesperson # {{selectedAlternateShipingAddress.accountManagerName != null && selectedAlternateShipingAddress.accountManagerName != '' ? selectedAlternateShipingAddress.accountManagerName +" ("+selectedAlternateShipingAddress.accountManager+")" : "Not available"}}
+                                </div>
+                            </div>
+                            <div class="row" *ngIf="editAlternateAddressFlag">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="txtName" [disabled]="!checkDefaultCustomerAddressValidation" [required]="checkDefaultCustomerAddressValidation && editAlternateAddressFlag" name="txtName" #txtName placeholder="Name is required" [(ngModel)]="editedAlternateShipingAddress.customerName" (ngModelChange)="validAlternateShipingAddress()">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" *ngIf="selectedDelivery==='Delivery' || selectedDelivery==='ShipTo' " class="form-control" id="txtSteetAddress" name="txtSteetAddress" #txtSteetAddress placeholder="Street address is required" [(ngModel)]="editedAlternateShipingAddress.streetAddress" [required]="checkDefaultCustomerAddressValidation && editAlternateAddressFlag" (ngModelChange)="validAlternateShipingAddress()">
+                                        <input type="text" *ngIf="selectedDelivery==='Pickup'" class="form-control" id="txtSteetAddress" name="txtSteetAddress" #txtSteetAddress placeholder="Street address" [(ngModel)]="editedAlternateShipingAddress.streetAddress">
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-5 col-lg-5" style="padding-left:0; padding-right: 13px;">
+                                        <input type="text" *ngIf="selectedDelivery==='Delivery' || selectedDelivery==='ShipTo'" class="form-control" id="txtCity" name="txtCity" #txtCity placeholder="City is required" [(ngModel)]="editedAlternateShipingAddress.city" [required]="checkDefaultCustomerAddressValidation && editAlternateAddressFlag" (ngModelChange)="validAlternateShipingAddress()">
+                                        <input type="text" *ngIf="selectedDelivery==='Pickup'" class="form-control" id="txtCity" name="txtCity" #txtCity placeholder="City" [(ngModel)]="editedAlternateShipingAddress.city">
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-4 col-lg-4" style="padding-left:0;padding-right:0;">
+                                        <!--<input type="text" class="form-control" id="txtState" name="txtState" #txtState placeholder="State" [(ngModel)]="editedAlternateShipingAddress.state">-->
+                                        <select class="form-control" id="ddlState" name="ddlState" [(ngModel)]="editedAlternateShipingAddress.state">
+                                            <option value="">State</option>
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CA">California</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NY">New York</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="DC">Washington DC</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-sm-12 col-md-3 col-lg-3" style="padding-right:0; padding-left: 13px;">
+                                        <input type="text" *ngIf="selectedDelivery==='Delivery' || selectedDelivery==='ShipTo'" class="form-control" id="txtPostalCode" name="txtPostalCode" #txtPostalCode placeholder="Postal code is required" [(ngModel)]="editedAlternateShipingAddress.postalCode" [required]="checkDefaultCustomerAddressValidation && editAlternateAddressFlag" (ngModelChange)="validAlternateShipingAddress()">
+                                        <input type="text" *ngIf="selectedDelivery==='Pickup'" class="form-control" id="txtPostalCode" name="txtPostalCode" #txtPostalCode placeholder="Postal code" [(ngModel)]="editedAlternateShipingAddress.postalCode">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="txtPhoneNo" [disabled]="!checkDefaultCustomerAddressValidation" [required]="checkDefaultCustomerAddressValidation && editAlternateAddressFlag" name="txtPhoneNo" #txtPhoneNo placeholder="Phone No. is required" [(ngModel)]="editedAlternateShipingAddress.phoneNumber" (ngModelChange)="validAlternateShipingAddress()" [pattern]="phoneRegexPattern" title="Please enter a phone number in valid format.">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="txtMSCAccountNumber" name="txtMSCAccountNumber" #txtMSCAccountNumber placeholder="MSC Account Number" [(ngModel)]="editedAlternateShipingAddress.mscAccountNumber">
+                                    </div>
+                                    <div>
+                                        <b>
+                                            Salesman # {{editedAlternateShipingAddress.accountManagerName != null && editedAlternateShipingAddress.accountManagerName != '' ? editedAlternateShipingAddress.accountManagerName +" ("+editedAlternateShipingAddress.accountManager+")" : "Not available"}}
+                                        </b>
+                                        <br>
+                                        <!--<span>Truck</span>
+                                        <br>
+                                        <br>-->
+                                    </div>
+                                    <button type="submit" *ngIf="selectedDelivery==='Pickup'" class="btn btn-default yellow-btn margin-t-10 pull-left margin-r-5" (click)="updateAlternateAddress()" [disabled]="checkDefaultCustomerAddressValidation && (!editedAlternateShipingAddress.customerName || !editedAlternateShipingAddress.phoneNumber)">Update</button>
+                                    <button type="submit" *ngIf="selectedDelivery==='Delivery' || selectedDelivery==='ShipTo'" class="btn btn-default yellow-btn margin-t-10 pull-left margin-r-5" (click)="updateAlternateAddress()" [disabled]="checkDefaultCustomerAddressValidation && (!editedAlternateShipingAddress.customerName || !editedAlternateShipingAddress.phoneNumber || !editedAlternateShipingAddress.streetAddress || !editedAlternateShipingAddress.city || !editedAlternateShipingAddress.postalCode)">Update</button>
+                                    <a href="#" class="hyperlink billing-cancel" (click)="validAlternateShipingAddress();editAlternateAddressFlag = false;">Cancel</a>
+                                </div>
+                            </div>
+                            <!--<br>
+                            <br>
+                            <br>-->
+                        </div>
+                        <!--Alternate Shipping Address End-->
+                        <!--Special Instructions Start-->
+                        <div class="title-of-box-hold float-left">
+                            <div class="title-of-box pull-left">Special Instructions</div>
+                        </div>
+                        <div class="float-left" style="margin:10px 0;">
+                            <textarea class="form-control" rows="3" id="txtarSpecialInstructions" maxlength="100" name="txtarSpecialInstructions" #txtarSpecialInstructions [(ngModel)]="specialInstructions" (focusout)="updateUnitNOPOSI()" (ngModelChange)="setSpecialInstructions()"></textarea>
+                        </div>
+                        <!--Special Instructions End-->
+                        <select class="form-control pull-left" style="width: 110px; margin:7px 0;" (change)="onOrderTypeChange(orderType.value)" #orderType>
+                            <option value="SalesOrder">Sales Order</option>
+                            <option value="Quote">Quote</option>
+                        </select>
+                        <!--<div class="purchaseOrderCheckbox" style="margin-top: 1%;margin-right: 40%;">
+                            <input id="includePurchaseOrder" name="includePurchaseOrder" #chkCashCustomer value="option" type="checkbox" [(ngModel)]="includePurchaseOrder" (change)="onDefaultPurchaseOrderChange($event)">
+                            <label for="includePurchaseOrder"><span></span> I need to include a Purchase Order for this transaction.</label>
+                        </div>-->
+                        <button id="btnPlaceOrder" *ngIf="orderType.value=='SalesOrder'" value="SalesOrder" style="width: 110px; margin: 7px;" class="btn btn-default yellow-btn margin-t-10 pull-left margin-r-5" type="submit" (click)="placeOrder()" [disabled]="!CheckoutForm.form.valid || !isValidAlternateShipingAddress || editAlternateAddressFlag || !cartsData || cartsData.length <= 0 || !isBillingTypeCustomers || hasUnprocuredZeroQtyItems || PayerInValidInBranch" [attr.title]="hasUnprocuredZeroQtyItems ? 'There are one or more parts in your cart that require procurement. Click Back To Cart to fix them.' : null">Create Order</button>
+                        <button id="btnPlaceOrder" *ngIf="orderType.value=='Quote'" value="SalesOrder" style="width: 110px; margin: 7px;" class="btn btn-default yellow-btn margin-t-10 pull-left margin-r-5" type="submit" (click)="placeOrder()" [disabled]="!CheckoutForm.form.valid || !isValidAlternateShipingAddress || editAlternateAddressFlag || !cartsData || cartsData.length <= 0 || !isBillingTypeCustomers || PayerInValidInBranch">Create Quote</button>
+                        <a class="back-to-cart hyperlink" [routerLink]="['/cart']">Back to Cart</a>
+                        &nbsp;<br /><br /><br /><br />
+                        <div [hidden]="defaultBillingType !='' && txtPONumber.valid && selectedDelivery != null && isValidAlternateShipingAddress && !editAlternateAddressFlag && cartsData && (!hasUnprocuredZeroQtyItems || orderType.value == 'Quote')" class="alert alert-danger">
+                            <div [hidden]="defaultBillingType !=''">Billing type is required.</div>
+                            <div [hidden]="txtPONumber.valid">PO Number is required.</div>
+                            <div [hidden]="txtUnitNumber.valid">No special characters allowed for unit number.</div>
+                            <div [hidden]="!PayerInValidInBranch">Payer is not valid for this branch.</div>
+                            <div [hidden]="selectedDelivery != null">Delivery option is required.</div>
+                            <div [hidden]="isValidAlternateShipingAddress">{{AlternateShipingAddressErrorMessage}}</div>
+                            <div *ngIf="txtPONumber.valid && selectedDelivery != null && isValidAlternateShipingAddress" [hidden]="!editAlternateAddressFlag">To continue, please click on update button.</div>
+                            <div [hidden]="cartsData && cartsData.length > 0">There are no items in the cart.</div>
+                            <div [hidden]="!hasUnprocuredZeroQtyItems || orderType.value == 'Quote'">There are one or more parts in your cart that require procurement. Click Back To Cart to fix them.</div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-sm-12 col-md-5 col-lg-5 ">
+                    <div class="billing-table table-responsive">
+                        <div class="billing-right">
+                            <h2>My Cart</h2>
+                            <span class="pull-left" *ngIf="cartsData && cartsData.length == 1">{{cartsData.length}} ITEM</span>
+                            <span class="pull-left" *ngIf="cartsData && cartsData.length > 1">{{cartsData.length}} ITEMS</span>
+                            <span class="pull-right"><a [routerLink]="['/cart']" class="hyperlink">Edit Cart</a></span>
+                        </div>
+                        <div *ngIf="!cartsData || cartsData.length <= 0">
+                            {{cartMessage}}
+                            <span class="countLoader" *ngIf="!cartsData"></span>
+                        </div>
+                        <div *ngIf="cartsData && cartsData.length > 0">
+                            <form #CheckoutCartForm="ngForm">
+                                <div class="table-scroll">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 135px;">Part #</th>
+                                                <th style="width:145px">Item</th>
+                                                <th class="right-text-align">Quantity</th>
+                                                <th class="right-text-align">Total</th>
+                                                <th class="paddingreset"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let cartItem of cartsData">
+                                                <td>{{cartItem.partNumber}}</td>
+                                                <td>
+                                                    {{cartItem.description}}<br>
+                                                    <span *ngIf="cartItem.corePrice>0">{{cartItem.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</span>
+                                                </td>
+                                                <td class="right-text-align">{{cartItem.quantity}}</td>
+                                                <td class="right-text-align">
+                                                    <div class="redText" *ngIf="cartItem.isSpecialPricing">Special Sale Price</div>
+                                                    <div [ngClass]="cartItem.isSpecialPricing? 'redText':''">
+                                                        {{cartItem.quantity  * (cartItem.finalPrice+(cartItem.coreOption=="CORE1" || cartItem.coreOption == null?0: cartItem.corePrice))==null?"0":cartItem.quantity * (cartItem.finalPrice+(cartItem.coreOption=="CORE1" || cartItem.coreOption == null?0: cartItem.corePrice))|currency:'USD': true:'1.2-2'}}
+                                                    </div>
+                                                </td>
+                                                <td class="paddingreset"><div class="pull-right price-tag checkout-price-tag" *ngIf="cartItem.isAdjustedPrice == true && !cartItem.isBuyout"></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <table class="table" style="border-top: 1px solid #CCC">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 135px;"></td>
+                                            <td style="font-size:15px; "><b>Subtotal</b></td>
+                                            <td></td>
+                                            <td style="text-align:right; font-size:15px;"><b>{{calculateCartTotals()|currency:'USD': true:'1.2-2'}}</b></td>
+                                            <td style="width: 10px; padding:0; margin:0;"></td>
+                                        </tr>
+                                        <tr [hidden]="!showFrieghtRow">
+                                            <td style="width: 84px;"></td>
+                                            <td style="width:145px;padding-top: 12px;">Estimated Freight</td>
+                                            <td></td>
+                                            <td style="text-align:right;padding-right: 3px;">
+                                                <span class="currency-sign">$</span> <input type="text" id="txtEstimatedFrieght" name="txtEstimatedFrieght" (focusout)="editFreight(estimatedFrieght)" [(ngModel)]="estimatedFrieght" value="{{estimatedFrieght*1}}" class="form-control pull-right right-text-align estimated-textbox" style="width:60px;" pattern="(?:\d*\.)?\d+" #txtEstimatedFrieght="ngModel" (keypress)="_keyPress($event)" />
+                                            </td>
+                                            <td class="paddingreset" style="width: 10px; padding:0; margin:0;">
+                                                <a class="fa fa-trash-o estimated-delete" style="color:#000" (click)="DeleteCartItem(freight[0].cartId, freight[0].cartItemId, true,false)"></a>
+                                                <span class="checkout-delivery-loader" *ngIf="showFrieghtLoader"></span>
+                                            </td>
+                                        </tr>
+                                        <tr [hidden]="selectedDelivery=='Pickup' || !showDeliveryRow">
+                                            <td></td>
+                                            <td style="width:145px;padding-top: 12px;">Estimated Delivery</td>
+                                            <td></td>
+                                            <td style="text-align:right;padding-right: 3px;">
+                                                <span class="currency-sign">$</span><input type="text" id="txtEstimatedDelivery" name="txtEstimatedDelivery" (focusout)="editDelivery(estimatedDelivery)" [(ngModel)]="estimatedDelivery" value="{{estimatedDelivery*1}}" class="form-control pull-right right-text-align estimated-textbox" style="width:60px;" pattern="(?:\d*\.)?\d+" #txtEstimatedDelivery="ngModel" (keypress)="_keyPress($event)" />
+                                            </td>
+                                            <td class="paddingreset" style="width: 10px; padding:0; margin:0;">
+                                                <a class="fa fa-trash-o estimated-delete" style="color:#000" (click)="DeleteCartItem(delivery[0].cartId, delivery[0].cartItemId, false,false)"></a>
+                                                <span class="checkout-delivery-loader" *ngIf="showDeliveryLoader"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:55px;"></td>
+                                            <td class="bold-font;">
+                                                TOTAL
+                                            </td>
+                                            <td></td>
+                                            <td class="right-text-align bold-font">
+                                                {{calculateCartTotals() + (estimatedFrieght*1==null ? 0:estimatedFrieght*1) + (estimatedDelivery*1==null ? 0:estimatedDelivery*1) |currency:'USD': true:'1.2-2'}}
+                                                <input type="hidden" id="hdnTotal" name="hdnTotal" #hdnTotal [(ngModel)]="total" [value]="calculateCartTotals() + (estimatedFrieght==null ? 0:estimatedFrieght) + (estimatedDelivery == null ? 0:estimatedDelivery)" />
+                                            </td>
+                                            <th style="width: 10px; padding:0; margin:0;"></th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<coupon-modal #couponModal [cart-total]="calculateCartTotals()" (onCouponInsert)="placeOrder($event,couponCartItem);" *ngIf="cartsData && cartsData.length > 0"></coupon-modal>-->

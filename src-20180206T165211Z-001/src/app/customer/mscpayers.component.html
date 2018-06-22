@@ -1,0 +1,65 @@
+﻿<!--MSC Payers Popup -->
+<div class="modal fade bs-example-modal-md" id="mscpayersModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">MSC Payers</h4>
+            </div>
+            <div class="modal-body" style="overflow:auto;padding: 0px 0 15px 0;">
+                <div id="divMSCPayers" class="col-md-10 col-md-offset-1" *ngIf="customerMSCPayerData!=null && customerMSCPayerData !=undefined">
+                    <form>
+                        <div class="form-group">
+                            <label for="txtmscCardNumber">MSC card Number </label>
+                            <input type="text" class="form-control" id="txtmscCardNumber" name="txtmscCardNumber" #txtmscCardNumber="ngModel" [(ngModel)]="customerMSCPayerData.mscCardNumber">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 msc-payer-list">
+                                <div class="form-group form-inline radio_Check_box" *ngIf="customerMSCPayerData.payers">
+                                    <label *ngIf="customerMSCPayerData.payers.length > 0 ">Payers </label>
+                                    <div *ngFor="let payer of customerMSCPayerData.payers">
+                                        <input id="{{'radio' + payer.payerNumber}}" type="radio" name="payerNumberOptions" #billingTypeOptions="ngModel" [(ngModel)]="defaultPayer.payerNumber" (change)="onPayerChange(payer)" value="{{payer.payerNumber}}">
+                                        <label for="{{'radio' + payer.payerNumber}}">
+                                            <span><span></span></span>
+                                            {{payer.name}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 msc-payer-list">
+                                <!--<div class="form-group form-inline radio_Check_box" *ngIf="customerMSCPayerData.shipTos">
+                                    <label *ngIf="customerMSCPayerData.shipTos.length > 0 ">Ship To </label>
+                                    <table class="table ">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Payer Number</th>
+                                                <th>MSC Card Number</th>
+                                                <th>Is Default</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let shipTo of customerMSCPayerData.shipTos" >
+                                                <td>{{shipTo.name}}</td>
+                                                <td>{{shipTo.payerNumber}}</td>
+                                                <td>{{shipTo.mscCardNumber}}</td>
+                                                <td>{{shipTo.isDefault}}</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group pull-right">
+                            <button type="button" class="btn btn-default yellow-btn" (click)="setPayer(true);">Set Payer Details</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end MSC Payers -->

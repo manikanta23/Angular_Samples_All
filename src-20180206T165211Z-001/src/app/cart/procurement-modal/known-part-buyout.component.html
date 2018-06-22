@@ -1,0 +1,144 @@
+﻿<!-- Known Part buyout Popup -->
+<div class="modal fade bs-example-modal-md" id="knownPartBuyoutModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-truck" aria-hidden="true"></i> Parts Buyout</h4>
+                    </div>
+                    <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                        <input type="text" id="searchFavouriteId" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search…">
+                        <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+                <div class="modal-body" style="width: 100%; padding:0;">
+                    <div style="min-height: 200px; max-height: 450px; overflow-y: auto; overflow-x:hidden; width: 100%;">
+                        <div id="divProcurement" style="margin-top: -19px;">
+
+                            <form #KnownPartBuyoutForm="ngForm">
+
+                                <accordion [showArrows]="false" [closeOthers]="true">
+                                    <accordion-group (onToggle)="onToggleAccordion(cartItem)" *ngFor="let cartItem of filteredCartItems;let i=index">
+                                        <accordion-heading>
+                                            <div>
+                                                <div class="col-sm-1">
+                                                    <accordion-toggle>
+                                                        <i class="fa fa-plus" style="cursor:pointer" *ngIf="!cartItem.isOpened" aria-hidden="true"></i>
+                                                        <i class="fa fa-minus" style="cursor:pointer" *ngIf="cartItem.isOpened" aria-hidden="true"></i>
+                                                    </accordion-toggle>
+                                                    <span *ngIf="(cartItem.knownPartPrice < cartItem.knownPartBuyoutAmount) && (cartItem.knownPartPrice && cartItem.knownPartBuyoutAmount) && !cartItem.continueWithLessSalesPrice" class="redText"><i title="The Buyout Amount is more than the Sales Price." class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+                                                </div>
+                                                <div class="col-sm-5">
+                                                    <b>Part Number:</b><br />
+                                                    <span>{{cartItem.partNumber}}</span>
+                                                </div>
+
+                                                <div class="col-sm-5">
+                                                    <b>Vendor:</b>
+                                                    <br />
+                                                    <span class="ellipsisText" title="{{cartItem.knownPartVendor ? cartItem.knownPartVendor.name:''}}">{{cartItem.knownPartVendor ? cartItem.knownPartVendor.name:''}}</span><br />
+                                                </div>
+
+                                                <div class="col-sm-1">
+                                                    <a role="button" (click)="removeCartItem(cartItem);"><i class="fa fa-times pull-right" style="color:#f72727;" aria-hidden="true"></i></a>
+                                                </div>
+                                            </div>
+                                        </accordion-heading>
+
+                                        <div class="card-body">
+
+                                            <div class="form-group full-width">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <a role="button" *ngIf="!cartItem.showVendorPanel" class="hyperlink  pull-right" (click)="changeVendor(cartItem);"><i class="fa fa-pencil" style="color:#333" aria-hidden="true"></i>Edit Vendor</a>
+                                                        <a role="button" *ngIf="cartItem.showVendorPanel" class="hyperlink  pull-right" (click)="cartItem.showVendorPanel=false;">Cancel</a>
+                                                    </div>
+                                                </div>
+                                                <div class="row" *ngIf="cartItem.showVendorPanel">
+                                                    <div class="col-md-12 pull-right">
+                                                        <vendor-panel #knownPartVendorPanel (callbackVendorSelect)="onKnownPartVendorSelect($event,knownPartVendor)"></vendor-panel>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <b>Vendor Part Purchase Price </b>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <b>Customer Part Purchase Price </b>
+                                                    </div>
+                                                </div>
+                                                <div><div></div><div></div></div>
+                                                <div class="row">
+                                                    <div class="col-sm-6" *ngIf="cartItem.isDefaultVendorSelected">
+                                                        <span>{{cartItem.knownPartBuyoutAmount}}</span>
+                                                    </div>
+                                                    <div class="col-sm-6" *ngIf="!cartItem.isDefaultVendorSelected">
+                                                        <input id="{{'txtKnownPartBuyoutAmount_' + i}}" name="{{'knownPartBuyoutAmount_' + i}}" #txtKnownPartBuyoutAmount class="form-control " type="text" ng-minlength="1" [(ngModel)]="cartItem.knownPartBuyoutAmount" placeholder="Buyout Price" (keypress)="knownPartPriceKeyPress($event)" (paste)="knownPartPriceOnPaste(cartItem, $event)" (focusout)="knownPartBuyoutCorrectPrice(cartItem, txtKnownPartBuyoutAmount.value)" maxlength="14">
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <input id="{{'txtKnownPartPrice_' + i}}" name="{{'knownPartPrice_' + i}}" #txtKnownPartPrice class="form-control" type="text" ng-minlength="1.5" [(ngModel)]="cartItem.knownPartPrice" placeholder="Sales Price" (keypress)="knownPartPriceKeyPress($event)" (paste)="knownPartPriceOnPaste($event)" (focusout)="knownPartCorrectPrice(cartItem, txtKnownPartPrice.value)" maxlength="14">
+                                                    </div>
+                                                </div>
+                                                <div class="row" *ngIf="cartItem.isPartBuyOutCorePart">
+                                                    <div class="col-sm-6">
+                                                        <b>Vendor Core Purchase Price </b>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <b>Customer Core Price </b>
+                                                    </div>
+                                                </div>
+                                                <div><div></div><div></div></div>
+                                                <div class="row" *ngIf="cartItem.isPartBuyOutCorePart">
+                                                    <div class="col-sm-6" *ngIf="cartItem.isDefaultVendorSelected">
+                                                        <span>{{cartItem.coreknownPartBuyoutAmount}}</span>
+                                                    </div>
+                                                    <div class="col-sm-6" *ngIf="!cartItem.isDefaultVendorSelected">
+                                                        <input id="{{'txtCoreKnownPartBuyoutAmount_' + i}}" name="{{'coreknownPartBuyoutAmount_' + i}}" #txtCoreKnownPartBuyoutAmount class="form-control" ng-minlength="1" type="text" [(ngModel)]="cartItem.coreknownPartBuyoutAmount" placeholder="Core Buyout Price" (keypress)="coreknownPartPriceKeyPress($event)" (paste)="coreknownPartPriceOnPaste(cartItem, $event)" (focusout)="coreknownPartBuyoutCorrectPrice(cartItem, txtCoreKnownPartBuyoutAmount.value)" maxlength="14">
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <span> {{cartItem.coreknownPartPrice}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="full-width" *ngIf="(cartItem.knownPartPrice < cartItem.knownPartBuyoutAmount) && (cartItem.knownPartPrice && cartItem.knownPartBuyoutAmount)">
+                                                <div class="pull-left full-width">
+                                                    <span class="pull-left" style="width:6%"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:red;"></i></span>
+                                                    <span class="pull-left" style="width:94%"><b>Warning: The Buyout Amount is more than the Sales Price</b></span>
+                                                </div>
+                                                <div class="pull-left full-width">
+                                                    <span class="pull-left" style="width:6%"><input id="{{'chkSalesPrice_' + i}}" name="{{'chkSalesPrice_' + i}}" #chkSalesPrice type="checkbox" [(ngModel)]="cartItem.continueWithLessSalesPrice" required /><label for="{{ 'chkSalesPrice_' + i }}" style="padding: 0px 4px;"><span><span></span></span></label></span>
+                                                    <span class="pull-left" style="width:94%">Yes, I realize that the Buyout Amount is more than Sales Price and I wish to continue with this Parts Buyout.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </accordion-group>
+                                </accordion>
+                            </form>
+                            <div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-md black-text btnBg yellow-btn full-width" id="btnConfirmPartsBuyout" [disabled]="!KnownPartBuyoutForm.form.valid" (click)="confirmPartsBuyout();">Confirm Parts Buyout</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div [hidden]="KnownPartBuyoutForm.form.valid" class="alert alert-danger full-width margin-t-10 ">
+                                    <div [hidden]="KnownPartBuyoutForm.form.valid">Fix is required for parts, those are having Buyout Amount is more than the Sales Price.</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end Known Part buyout -->

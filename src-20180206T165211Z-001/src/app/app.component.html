@@ -1,0 +1,278 @@
+﻿<!--Nav Start-->
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="pager-header-container">
+        <div class="container padding-0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" *ngIf="router.url.indexOf('/login') >= 0 && isAuthenticated"><img src="content/images/Companylogo.jpg" style="width:108px;height:53px;" title="Home" alt="Home"> <span>PartsLink</span></a>
+                <a class="navbar-brand" style="cursor:pointer" (click)="clearCustomerValue()" *ngIf="router.url.indexOf('/login') < 0 && isAuthenticated"><img src="content/images/Companylogo.jpg" style="width:108px;height:53px;" title="Home" alt="Home"> <span>Parts Link</span></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse navbar-right header-user-branch">
+
+                <div class="top-nav-menu" style="position: relative;">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <div class="context-menu-container">
+                                <popover-content #notificationPopover id="notificationPopover" placement="bottom" [closeOnClickOutside]="true">
+                                    <div>
+                                        <ul class="list-unstyled options-list notifications">
+
+                                            <div class="notification-heading">
+                                                <h4 class="menu-title">Notifications ({{unreadUserNotificationsCount}})</h4>
+                                                <a role="button" (click)="markAllNotification();"><h4 class="menu-title-sub pull-right"> mark all as read.</h4></a>
+                                            </div>
+
+                                            <li class="divider"></li>
+                                            <li class="notifications-wrapper">
+                                                <div class="content" *ngIf="isLoadingNotification && (userNotifications == undefined || userNotifications == null)">
+                                                    <h5 class="margin-l-r-10">
+                                                        loading notifications ...
+                                                    </h5>
+                                                </div>
+                                                <div class="content" *ngIf="!isLoadingNotification && userNotifications != undefined && userNotifications != null && userNotifications.length < 1">
+                                                    <h5 class="margin-l-r-10">
+                                                        No new notifications.
+                                                    </h5>
+                                                </div>
+                                                <div *ngIf="!isLoadingNotification && userNotifications != undefined && userNotifications != null && userNotifications.length > 0">
+                                                    <div class="content" *ngFor="let userNotification of userNotifications;">
+                                                        <a role="button" (click)="notificationDetails(userNotification); notificationPopover.hide();">
+                                                            <div class="notification-item" [ngClass]="userNotification.notificationUser.isRead == false ? 'unread-notification' : ''">
+                                                                <h4 class="item-title">{{userNotification.notification.title}}</h4>
+                                                                <p class="item-info">{{userNotification.notification.createdOn | notificationTimeFilter}}</p>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <div class="notification-footer"><h4 class="menu-title">See all notifications.</h4></div>
+
+                                        </ul>
+
+
+                                        <!--<u (click)="myPopover.hide()">Or click here to close it</u>.-->
+                                    </div>
+                                </popover-content>
+                                <a [popover]="notificationPopover">
+                                    <i class="glyphicon glyphicon-bell notification-icon"></i>
+                                    <span class="notification-count" *ngIf="!isLoadingNotification">{{unreadUserNotificationsCount}}</span>
+                                    <span class="notificationCountLoader" *ngIf="isLoadingNotification"></span>
+                                </a>
+                            </div>
+                        </li>
+                        <li *ngIf="hasCreateUserPermission || hasImportCouponsPermissions || hasReadCouponsPermissions" (mouseover)='disableScrollBar()' (mouseout)='enableScrollBar()'  >
+                            <a role="button">
+                                <span class="glyphicon glyphicon-cog" style="font-size: 18px;"></span>
+                            </a>
+                        </li>
+
+                        <li><span *ngIf="userName!=''" style="color:#fff;">{{userName}}</span></li>
+                    </ul>
+                    <div class="coupon" (mouseover)='disableScrollBar()' (mouseout)='enableScrollBar()'>
+                        <div class="collapse my-coupon">
+                            <table>
+                                <tr *ngIf="hasCreateUserPermission"><td><a class="hyperlink" [routerLink]="['/users']"> <span> <i class="fa fa-user-plus" aria-hidden="true"></i> Admin Dashbord</span></a></td></tr>
+                                <tr *ngIf="hasImportCouponsPermissions || hasReadCouponsPermissions"><td><a class="hyperlink" [routerLink]="['/couponManagement']"> <span> <i class="fa fa-tag" aria-hidden="true"></i> Coupon Management</span></a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="float:left;width: 100%;"><branch-view *ngIf="router.url.indexOf('/login') < 0 && isAuthenticated"></branch-view></div>
+
+            </div>
+        </div>
+        <div class="container-fluid padding-0" style="background: #000;">
+            <div class="user-sales-metrics" [hidden]="!showUserSalesMetrics">
+                <div class="container padding-0" style="height:35px" *ngIf="userSalesMetrics!= null && userSalesMetrics!=undefined">
+
+                    <table class="table">
+                        <tr>
+
+                            <td width="10%" style="position: relative;">
+                                <div>
+                                    <div class="col-md-10 padding-0">
+                                        <h1>Adoption</h1>
+                                        <h2>{{(userSalesMetrics.adoption | number:'1.2-2') + '%'}}</h2>
+                                    </div>
+                                    <div class="note" [popover]="adoptionPopover" [popoverOnHover]="true"></div>
+                                    <popover-content #adoptionPopover placement="top" [animation]="true">
+                                        <span style="white-space: nowrap">= PartsLink Sales / Total SAP Sales. Goal is 100%</span>
+                                    </popover-content>
+                                </div>
+                            </td>
+                            <td width="10%">
+                                <h1>Branch Rank</h1>
+                                <h2>{{userSalesMetrics.branchRank}}</h2>
+                            </td>
+                            <td width="16%">
+                                <div>
+                                    <div class="col-md-10 padding-0">
+                                        <h1>Related Parts Sales/%</h1>
+                                        <h2>{{userSalesMetrics.relatedParts | currency:'USD': true:'1.0-0'}} ({{(userSalesMetrics.partsLink >0 ?(userSalesMetrics.relatedParts/userSalesMetrics.partsLink):0) | percent:'1.2-2'}})</h2>
+                                    </div>
+                                    <div class="note" [popover]="relatedPartSalesPopover" [popoverOnHover]="true"></div>
+                                    <popover-content #relatedPartSalesPopover placement="top" [animation]="true">
+                                        <span style="white-space: nowrap">= Related Parts Invoice / Total SAP Sales.Goal is 6%</span>
+                                    </popover-content>
+                                </div>
+                            </td>
+                            <td width="13%">
+                                <h1>PartsLink Sales</h1>
+                                <h2>{{userSalesMetrics.partsLink | currency:'USD': true:'1.0-0'}}</h2>
+                            </td>
+                            <td width="12%">
+                                <h1>SAP Sales</h1>
+                                <h2>{{userSalesMetrics.sap | currency:'USD': true:'1.0-0'}}</h2>
+                            </td>
+                            <td width="13%">
+                                <h1>GP%</h1>
+                                <h2>{{(userSalesMetrics.gpPrecentage | number:'1.2-2') + '%'}}</h2>
+                            </td>
+                            <td width="13%">
+                                <div>
+                                    <div class="col-md-10 padding-0">
+                                        <h1>Open Orders</h1>
+                                        <h2>{{userSalesMetrics.openOrdersTotal |currency:'USD': true:'1.0-0' }}    ({{userSalesMetrics.openCartCount }})</h2>
+                                    </div>
+                                    <div class="note" [popover]="openOrdersPopover" [popoverOnHover]="true"></div>
+                                    <popover-content #openOrdersPopover placement="bottom" [animation]="true">
+                                        <span style="white-space: nowrap">Requires invoicing. Convert or close within 3 days</span>
+                                    </popover-content>
+                                </div>
+                            </td>
+                            <td width="13%" class="no-border">
+                                <div>
+                                    <div class="col-md-10 padding-0">
+                                        <h1>Open Quotes</h1>
+                                        <h2>{{userSalesMetrics.quotesTotal |currency:'USD': true:'1.0-0'}}  ({{userSalesMetrics.quoteCount}})</h2>
+                                    </div>
+                                    <div class="note" [popover]="openQuotesPopover" [popoverOnHover]="true"></div>
+                                    <popover-content #openQuotesPopover placement="left" [animation]="true">
+                                        <span style="white-space: nowrap">Follow up every 24 hours. Close out when lost sale.</span>
+                                    </popover-content>
+                                </div>
+                            </td>
+                            
+                        </tr>
+                    </table>
+                </div>
+                <button type="button" class="close close-user-sales-metrics close-icon" (click)="showUserSalesMetrics=false;">&times;</button>
+            </div>
+        </div>
+        <div class="container padding-0" *ngIf="router.url !== '/' && router.url !== '/#' && router.url.indexOf('/checkout')<0 && router.url.indexOf('/login')<0 && router.url.indexOf('/orderconfirmation')<0 && router.url.indexOf('/users')<0 && router.url.indexOf('/coupon')<0">
+            <header-search></header-search>
+            <div [ngClass]="showCreatePart == false ? 'filter-message-display' : ''">
+                <div class="col-sm-12 col-md-12 col-lg-12 create-part-div">
+                    <div [hidden]="!showCreatePart" class="pull-left">
+                        <span class="pull-left" style="margin:7px;"><i class="fa fa-exclamation-circle" style="color:red" aria-hidden="true"></i><label for="createPartLabel" style="padding: 0px 4px;"><span><span></span></span></label></span>
+                        <span class="pull-left" style="margin:7px;">There are no search results for part {{searchTerm}} in your branch. Choose another part or attempt to Create Part. Create Part will occur if part exists on a price file.</span>
+                    </div>
+                    <button type="button" *ngIf="showCreatePart" class="btn btn-default yellow-btn btn-width-160" style="margin:0 0 0 40px;" (click)="createPart();">
+                        <span *ngIf="!showCreatePartLoader">Create Part</span>
+                        <span *ngIf="showCreatePartLoader" style="vertical-align: super;">Processing...</span>
+                        <span class="countLoader" *ngIf="showCreatePartLoader"></span>
+                    </button>
+                    <span class="pull-right" style="font-size: 16px; margin: 4px; color: #929292;" (click)="showCreatePart=!showCreatePart"><i class="fa fa-times" aria-hidden="true"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/.nav-collapse -->
+</nav>
+<!--//Nav End-->
+
+<footer class="navbar-inverse text-center navbar-fixed-bottom">
+    <div class="container">
+        <div class="row container-footer">
+            <div class="col-md-2 navbar-brand left-text-align">
+                PartsLink {{appVersion}}
+            </div>
+            <div class="col-md-8 navbar-brand">
+                All rights reserved with Rush Truck Centers 2017
+            </div>
+            <div class="col-md-2 padding-0">
+                <a class="btn navbar-brand " href="http://www.rushtruckcenters.com/Contact-Us"><span class="padding-0">Contact Us</span></a>
+                <a class="btn navbar-brand pull-right " (click)="feedback()"><span class="padding-0">Send Feedback</span></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- show loading bar or circle -->
+<!--Currently commented as it displays following error
+    Error in app/app.component.html:24:34 caused by: Expression has changed after it was checked. Previous value: 'false'. Current value: 'true'.-->
+
+<div class="ShowHideLoadingPanel" [hidden]="!showloader">
+    <img src="../Content/Images/loader.gif" id="imgLoader" class="loadingImage" />
+</div>
+
+<!-- alert notification -->
+
+<div id="alertNotifications" *ngIf="notification.show ==true">
+    <div class="alert" id="NotificationTypeContainer" style="position: relative;"
+         [ngClass]="notification.type == notificationType.MultiLine ? 'alert-multi-line'
+                : notification.type == notificationType.Success ? 'alert-success'
+                : notification.type == notificationType.Info ? 'alert-info'
+                : notification.type == notificationType.Warning ? 'alert-warning' : 'alert-danger'">
+        <button class="close close-button" aria-label="close" type="button" (click)="closeNotification()" id="btnCloseNotification" name="btnCloseNotification">&times;</button>
+
+        <div *ngFor="let msg of notification.message;" style="min-width: 122px;">
+            <i class="fa" id="notificationIcon"
+               [ngClass]="msg.type == notificationType.MultiLine ? ''
+                : msg.type == notificationType.Success ? 'fa fa-check-circle success'
+                : msg.type == notificationType.Info ? 'fa fa-exclamation-triangle info'
+                : msg.type == notificationType.Warning ? 'fa fa-exclamation-triangle warning'
+               : notification.type == notificationType.MultiLine || msg.type == notificationType.danger ? 'fa fa-times-circle danger'
+               : 'fa fa-exclamation-circle danger'"></i>
+            &nbsp;<span [ngClass]="msg.type == notificationType.MultiLine ? ''
+                : msg.type == notificationType.Success ? 'success'
+                : msg.type == notificationType.Info ? 'info'
+                : msg.type == notificationType.Warning ? 'warning' : 'danger'"
+                        id="notificationMessage">{{msg.message}}</span>
+        </div>
+    </div>
+</div>
+<!--<page-container></page-container>-->
+<div class="parts container text-part-holder"
+     [ngClass]="
+     (router.url !=='/' && router.url !=='/#' && router.url.indexOf('/checkout') < 0 && router.url.indexOf('/login') < 0 && router.url.indexOf('/orderconfirmation') < 0) && !showUserSalesMetrics && showCreatePart? 'search-holder-create-part-holder no-user-sales-metrics' :
+	 (router.url !== '/' && router.url !== '/#' && router.url.indexOf('/checkout') < 0 && router.url.indexOf('/login') < 0 && router.url.indexOf('/orderconfirmation') < 0) && showUserSalesMetrics && !showCreatePart? 'search-header-user-sales-metrics' :
+
+	 (router.url !== '/' && router.url !== '/#' && router.url.indexOf('/checkout') < 0 && router.url.indexOf('/login') < 0 && router.url.indexOf('/orderconfirmation') < 0) && showUserSalesMetrics && showCreatePart? 'search-header-user-sales-metrics-create-part-holder' :
+
+     !(router.url !== '/' && router.url !== '/#' && router.url.indexOf('/checkout') < 0 && router.url.indexOf('/login') < 0 && router.url.indexOf('/coupon') < 0 && router.url.indexOf('/orderconfirmation') < 0) && !showUserSalesMetrics ? 'no-search-holder' :
+	 !(router.url !== '/' && router.url !== '/#' && router.url.indexOf('/checkout') < 0 && router.url.indexOf('/login') < 0 && router.url.indexOf('/coupon') < 0 && router.url.indexOf('/orderconfirmation') < 0) && showUserSalesMetrics ? 'no-search-holder  no-search-holder-user-sales-metrics' : ''">
+<router-outlet></router-outlet>
+</div>
+<customer-modal #customerModal></customer-modal>
+<inventory-modal #inventoryModal></inventory-modal>
+<favourite-vendors-modal #favouriteVendorsModal></favourite-vendors-modal>
+<vendors-modal #vendorsModal></vendors-modal>
+<partBuyout-modal #partBuyoutModal></partBuyout-modal>
+<!--Start New Cart-->
+<div class="modal fade bs-example-modal-sm" id="startNewCart" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body customer-table">
+                Do you want to save the cart for the selected customer and branch?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" data-dismiss="modal" (click)="startNewCart();">Yes</button>
+                <button type="button" class="btn yellow-btn" (click)="removeCarts();" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Start New Cart end-->
+<create-part-modal #createPartModal></create-part-modal>
+<mscpayers-modal #mscpayersModal></mscpayers-modal>
+
+<coupon-modal #couponModal></coupon-modal>
+<favourites-modal #favouritesModal *ngIf="commonDataService.Branch"></favourites-modal>

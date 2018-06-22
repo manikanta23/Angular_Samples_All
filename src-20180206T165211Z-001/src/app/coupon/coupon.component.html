@@ -1,0 +1,49 @@
+﻿<div class="coupon-management padding-t-b-15">
+    <div class="title-of-box-hold">
+        <div class="title-of-box pull-left">Coupon Management</div>
+    </div>
+    <div *ngIf="!couponsPermissions || !couponsPermissions.hasImportCouponsPermissions" style="padding: 15px;">
+        <h4>You do not have coupon import permission.</h4>
+    </div>
+    <div *ngIf="couponsPermissions && couponsPermissions.hasImportCouponsPermissions">
+        <div class="row coupon-header" style="padding-bottom:0;">
+            <div class="col-lg-10">
+                <div class="form-group col-md-12">
+                    <button type="button" class="btn yellow-btn" id="btnAddFiles" (click)="addFilesClick();" style="margin-right:5px;"><i class="fa fa-plus" aria-hidden="true"></i> Add Files</button>
+
+                    <button type="button" class="btn yellow-btn" id="btnDeleteFiles" (click)="uploadFilesClick();" style="margin-right:5px;"><i class="fa fa-plus" aria-hidden="true"></i> Upload Files</button>
+                    <button type="button" class="btn yellow-btn" id="btnDeleteFiles" (click)="cancel();" style="margin-right:5px;"><i class="fa fa-minus-circle" aria-hidden="true"></i> Cancel</button>
+
+                    <a [routerLink]="['/couponManagement']" class="hyperlink" style="margin-top:30px;margin-right:10px;">Coupon Management</a>
+                    <a href="templates/Coupon-Offer-template.xlsx" class="hyperlink" style="padding-top:10px;margin-right:10px;" target="_blank">Download Example File</a>
+                    <a [routerLink]="['/couponFileImportSummary']" class="hyperlink" style="margin-top:30px;margin-right:10px;">Coupon File Import Summary</a>
+                </div>
+            </div>
+        </div>
+        <!--<div class="row coupon-upload" *ngIf="isDeleteBtn">
+            <div class="col-lg-6 fileDrop" >
+                <div class="form-group">
+                    <input type="file" id="btnDelete" class="form-control-file" (change)="deleteFile($event)" />
+                </div>
+            </div>
+        </div>-->
+        <div class="row coupon-upload">
+            <div class="col-lg-6 fileDrop" *ngIf="isUploadBtn">
+                <div class="add-file">
+                    <input type="file" id="btnUpload" class="form-control-file" (change)="fileChange($event)" />
+                </div>
+            </div>
+
+            <div class="col-lg-12" *ngIf="isFileImported">
+                <div class="alert alert-multi-line">
+                    <div *ngFor="let msg of fileUploadMessages;">
+                        <span [ngClass]="notificationType[msg.type] == notificationType.Success ? 'success' : 'danger'" id="notificationMessage">
+                            {{msg.message}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </div>
+</div>
+      

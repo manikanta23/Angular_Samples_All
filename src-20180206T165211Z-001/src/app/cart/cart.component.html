@@ -1,0 +1,555 @@
+﻿<div>
+    <div class="row">
+        <div class="my-cart-list-page">
+            <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                <div class="col-sm-12 col-md-12 col-lg-12 left-area padding-b-25 heading-search" style="background-color:#FFF;">
+
+                    <div class="title-of-box-hold">
+                        <div class="title-of-box pull-left">
+                            My Cart
+                            <span *ngIf="cartCount">{{cartCount}} {{(cartCount==1 || cartCount==0)? 'ITEM' :'ITEMS'}} </span>
+                        </div>
+                    </div>
+                    
+                    <div class="row my-cart-list-button-header">
+                        <div  class="pull-left" style="padding: 5px 25px;">
+                            <a role="button" class="hyperlink" *ngIf="selectedCartItemArray.length <= 0" (click)="selectAll();">Select all</a>
+                            <a role="button" class="hyperlink" *ngIf="selectedCartItemArray.length > 0" (click)="unSelectAll();">Unselect all</a>
+                        </div>
+                        <div class="pull-right">
+                            <span>Choose one action: </span>
+                            <button type="button" class="btn yellow-btn" id="btnHotFlag" [disabled]="selectedCartItemArray.length <= 0 || disableProcurementbuttons" (click)="ShowHotFlagModal()"><i class="fa fa-rocket" aria-hidden="true"></i> HotFlag</button>
+                            <button type="button" class="btn yellow-btn" id="btnPartsBuyout" [disabled]="selectedCartItemArray.length <= 0 || disableProcurementbuttons" (click)="ShowKnownPartBuyoutModal()"><i class="fa fa-truck" aria-hidden="true"></i> Parts Buyout</button>
+                            <button type="button" class="btn yellow-btn" id="btnStockTransferOrder" [disabled]="selectedCartItemArray.length <= 0 || disableProcurementbuttons" (click)="ShowStockTransferModal();"><i class="fa fa-exchange" aria-hidden="true" ></i> Stock Transfer Order</button>
+                            <button type="button" class="btn yellow-btn" id="btnMSCFleetVerification" [disabled]="selectedCartItemArray.length <= 0 || disableProcurementbuttons || !isMscOrFleetCustomer" (click)="verifyPriceOfAllCartItems();"><i class="fa fa-check-square" aria-hidden="true"></i> MSC/Fleet Verification</button>
+                            <button type="button" class="btn yellow-btn" id="btnDeleteItem" [disabled]="selectedCartItemArray.length <= 0" (click)="removeCartItems()"><i class="fa fa-trash" aria-hidden="true"></i> Delete Item</button>
+                        </div>
+                    </div>
+
+                    <div class="my-cart-list-table table-responsive" *ngIf="!((cartsData && cartsData != undefined && cartsData != null && cartsData.length > 0) || (partsBuyOutData && partsBuyOutData != undefined && partsBuyOutData != null && partsBuyOutData.length > 0) || (hotFlagData && hotFlagData != undefined && hotFlagData != null && hotFlagData.length > 0) || (stockTransferData && stockTransferData != undefined && stockTransferData != null && stockTransferData.length > 0))">
+                        <h5>{{cartMessage}}</h5>
+                    </div>
+                    <div class="my-cart-list-table table-responsive" *ngIf="cartsData || partsBuyOutData || hotFlagData || stockTransferData">
+                        <!-- Known Parts Start -->
+                        <table class="table" style="width:100%" *ngIf="cartsData && cartsData != undefined && cartsData != null && cartsData.length > 0">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center;">Items</th>
+                                    <th style="width: 180px;">Part Number</th>
+                                    <th style="width: 222px;">Item</th>
+                                    <th style="width: 185px;">Unit Price</th>
+                                    <th width="220px"></th>
+                                    <th style="width:200px">Quantity</th>
+                                    <th class="text-align-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let Cart of cartsData;">
+                                    <td>
+                                        <div class="checkbox">
+                                            <input type="checkbox" name="field" value="option" [(ngModel)]="Cart.selected" (change)="onCartItemSelectionChange(Cart,Cart.selected)">
+                                            <label><span><span></span></span> </label>
+                                        </div>
+                                    </td>
+                                    <td style="font-weight:normal">
+                                        <a class="hyperlink" *ngIf="!Cart.isBuyout" [routerLink]="['/parts']" [queryParams]="{searchTerm:Cart.partNumber,partId:Cart.partId, src:sourceLocationType.Cart}">
+                                            {{Cart.partNumber}}<br />
+                                        </a>
+                                        <span *ngIf="Cart.isBuyout">{{Cart.partNumber}}<br /></span>
+                                        <span *ngIf="Cart.binLocation"> BIN: {{Cart.binLocation}}</span>
+                                    </td>
+                                    <td style="font-weight:normal">
+
+                                        {{Cart.description}}
+
+                                        <div *ngIf="Cart.corePrice>0" style="font-weight:normal">
+                                            <select class="form-control core-options" #myCartCoreOption (change)="updateCartItems(Cart)" [(ngModel)]="Cart.coreOption" style="width: 115px;">
+                                                <option value="NOCORER" selected>No Core Returned</option>
+                                                <option value="CORE1">Core Returned</option>
+                                            </select>
+                                        </div>
+                                        <br>
+                                    </td>
+                                    <td style="font-weight:normal">
+                                        <div class="redText" *ngIf="Cart.isSpecialPricing">Special Sale Price</div>
+                                        <div [ngClass]="Cart.isSpecialPricing? 'redText':''">
+                                            <span *ngIf="Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}<br />
+                                                <span>orig. {{Cart.listPrice==null?"0":Cart.listPrice|currency:'USD': true:'1.2-2'}}</span>
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span>
+                                            <span *ngIf="!Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span>
+                                        </div>
+                                        <a *ngIf="!Cart.isBuyout && Cart.couponId==null" class="btn price-tag pull-left" data-toggle="modal" data-target="#priceoverrideOnCart" (click)="priceOverride(Cart)" style="margin-left:5px;"></a>
+                                        <i class="fa fa-ticket coupon" *ngIf="Cart.hasCoupon" title="Part is eligible for coupon" style="font-size: 16px;"></i>
+                                    </td>
+                                    <td>
+                                        <div class="col-md-12 padding-0">
+
+                                        </div>
+                                    </td>
+                                    <td class="quantity" style="font-weight:normal">
+                                        <div *ngIf="Cart.couponId==null">
+                                            <div class="range-text-box" style="padding-right:28px;">
+                                                <input style="width:100%" class="form-control pull-left right-text-align" type="text" [(ngModel)]="Cart.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(Cart,$event)" autofocus (focusout)="onQuantityFocusout(Cart,$event);" />
+                                                <div class="renge-top" (click)="Cart.quantity=(Cart.quantity*1)+1;updateCartItems(Cart)">&nbsp;</div>
+                                                <div class="renge-down" (click)="Cart.quantity=(Cart.quantity*1)>1?Cart.quantity-1:1;updateCartItems(Cart)">&nbsp;</div>
+                                            </div>
+                                            <br /><br />
+                                            <div *ngIf="!Cart.isSplit">{{Cart.quantityAvailable}} at {{branchCode}} {{branchCity}}</div>
+                                            <div *ngIf="Cart.isSplit"> 0 at {{branchCode}} {{branchCity}}</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-align-right" style="font-weight:normal" align="right">
+                                        <span>{{Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))==null?"0":Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))|currency:'USD': true:'1.2-2'}}</span>
+                                        <a class="btn price-verify-icon" style="cursor:default" *ngIf="Cart.isPriceVerified && Cart.couponId==null">v</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Known Parts End -->
+                        <!-- Parts BuyOut Start -->
+                        <div *ngIf="partsBuyOutData && partsBuyOutData != undefined && partsBuyOutData != null && partsBuyOutData.length > 0">
+                            <div class="row-heading">PARTS BUYOUT</div>
+                            <table class="table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">Items</th>
+                                        <th style="width: 180px;">Part Number</th>
+                                        <th style="width: 222px;">Item</th>
+                                        <th style="width: 185px;">Purchase Price</th>
+                                        <th width="140px">Sales Price</th>
+                                        <th>Vendor</th>
+                                        <th style="width:200px">Quantity</th>
+                                        <th class="text-align-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let Cart of partsBuyOutData;">
+                                        <td>
+                                            <div class="checkbox">
+                                                <input type="checkbox" name="field" value="option" [(ngModel)]="Cart.selected" (change)="onCartItemSelectionChange(Cart,Cart.selected)">
+                                                <label><span><span></span></span> </label>
+                                            </div>
+                                        </td>
+                                        <td style="font-weight:normal">
+                                            <a class="hyperlink" *ngIf="!Cart.isBuyout" [routerLink]="['/parts']" [queryParams]="{searchTerm:Cart.partNumber,partId:Cart.partId}">
+                                                {{Cart.partNumber}}<br />
+                                            </a>
+                                            <span *ngIf="Cart.isBuyout">{{Cart.partNumber}}<br /></span>
+                                            <span *ngIf="Cart.binLocation"> BIN: {{Cart.binLocation}}</span>
+                                        </td>
+                                        <td style="font-weight:normal">
+
+                                            {{Cart.description}}
+
+                                            <div *ngIf="Cart.corePrice>0" style="font-weight:normal">
+                                                <select class="form-control core-options" #myCartCoreOption (change)="updateCartItems(Cart)" [(ngModel)]="Cart.coreOption" style="width: 115px;">
+                                                    <option value="NOCORER" selected>No Core Returned</option>
+                                                    <option value="CORE1">Core Returned</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                        </td>
+                                        <td style="font-weight:normal">
+
+                                            <span *ngIf="Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                {{Cart.purchasePrice==null?"0":Cart.purchasePrice|currency:'USD': true:'1.2-2'}}<br />
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span>
+                                            <span *ngIf="!Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                {{Cart.purchasePrice==null?"0":Cart.purchasePrice|currency:'USD': true:'1.2-2'}}
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span> <a *ngIf="!Cart.isBuyout" class="btn price-tag pull-left" data-toggle="modal" data-target="#priceoverrideOnCart" (click)="priceOverride(Cart)" style="margin-left:5px;"></a>
+                                            <i class="fa fa-ticket coupon" *ngIf="Cart.hasCoupon" title="Part is eligible for coupon" style="font-size: 16px;"></i>
+                                        </td>
+                                        <td>
+                                            <span *ngIf="Cart.isAdjustedPrice" class="pull-left">
+                                                {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                <span *ngIf="Cart.finalPrice - Cart.purchasePrice > 0" class="green">(+ {{Cart.finalPrice - Cart.purchasePrice |currency:'USD': true:'1.2-2'}} Per Unit)</span>
+                                                <span *ngIf="Cart.finalPrice - Cart.purchasePrice < 0" class="red">({{Cart.finalPrice - Cart.purchasePrice |currency:'USD': true:'1.2-2'}} Per Unit)</span>
+                                                <br />
+                                                <span>orig. {{Cart.listPrice==null?"0":Cart.listPrice|currency:'USD': true:'1.2-2'}}</span>
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span>
+                                            <span *ngIf="!Cart.isAdjustedPrice" class="pull-left">
+                                                {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                <span *ngIf="Cart.finalPrice - Cart.purchasePrice > 0" class="green">(+ {{Cart.finalPrice - Cart.purchasePrice |currency:'USD': true:'1.2-2'}} Per Unit)</span>
+                                                <span *ngIf="Cart.finalPrice - Cart.purchasePrice < 0" class="red">({{Cart.finalPrice - Cart.purchasePrice |currency:'USD': true:'1.2-2'}} Per Unit)</span>
+                                                <br />
+                                                <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                            </span> <a class="btn price-tag pull-left" data-toggle="modal" data-target="#priceoverrideOnCart" (click)="priceOverride(Cart)" style="margin-left:5px;"></a>
+                                        </td>
+                                        <td>
+                                            {{Cart.vendorCode | customerNumberFilter}}
+                                        </td>
+                                        <td class="quantity" style="font-weight:normal">
+                                            <div class="range-text-box" style="padding-right:28px;">
+                                                <input style="width:100%" class="form-control pull-left right-text-align" type="text" [(ngModel)]="Cart.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(Cart,$event)" autofocus (focusout)="onQuantityFocusout(Cart,$event);" />
+                                                <div class="renge-top" (click)="Cart.quantity=(Cart.quantity*1)+1;updateCartItems(Cart)">&nbsp;</div>
+                                                <div class="renge-down" (click)="Cart.quantity=(Cart.quantity*1)>1?Cart.quantity-1:1;updateCartItems(Cart)">&nbsp;</div>
+                                            </div>
+                                            <br /><br />
+                                            <div *ngIf="!Cart.isSplit">{{Cart.quantityAvailable}} at {{branchCode}} {{branchCity}}</div>
+                                            <div *ngIf="Cart.isSplit"> 0 at {{branchCode}} {{branchCity}}</div>
+                                        </td>
+                                        <td class="text-align-right" style="font-weight:normal" align="right">
+                                            <span>{{Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))==null?"0":Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))|currency:'USD': true:'1.2-2'}}</span> <a class="btn price-verify-icon" style="cursor:default" *ngIf="Cart.isPriceVerified">v</a>
+
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Parts BuyOut  End -->
+                        <!-- HotFlag Start -->
+                        <div *ngIf="hotFlagData && hotFlagData != undefined && hotFlagData != null && hotFlagData.length > 0">
+                            <div class="row-heading">HOTFLAG</div>
+                            <table class="table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">Items</th>
+                                        <th style="width: 180px;">Part Number</th>
+                                        <th style="width: 222px;">Item</th>
+                                        <th style="width: 185px;">Unit Price</th>
+                                        <th width="220px">HotFlag Value</th>
+                                        <th style="width:200px">Quantity</th>
+                                        <th class="text-align-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let Cart of hotFlagData;">
+                                        <td>
+                                            <div class="checkbox">
+                                                <input type="checkbox" name="field" value="option" [(ngModel)]="Cart.selected" (change)="onCartItemSelectionChange(Cart,Cart.selected)">
+                                                <label><span><span></span></span> </label>
+                                            </div>
+                                        </td>
+                                        <td style="font-weight:normal">
+                                            <a class="hyperlink" *ngIf="!Cart.isBuyout" [routerLink]="['/parts']" [queryParams]="{searchTerm:Cart.partNumber,partId:Cart.partId}">
+                                                {{Cart.partNumber}}<br />
+                                            </a>
+                                            <span *ngIf="Cart.isBuyout">{{Cart.partNumber}}<br /></span>
+                                            <span *ngIf="Cart.binLocation"> BIN: {{Cart.binLocation}}</span>
+                                        </td>
+                                        <td style="font-weight:normal">
+
+                                            {{Cart.description}}
+
+                                            <div *ngIf="Cart.corePrice>0" style="font-weight:normal">
+                                                <select class="form-control core-options" #myCartCoreOption (change)="updateCartItems(Cart)" [(ngModel)]="Cart.coreOption" style="width: 115px;">
+                                                    <option value="NOCORER" selected>No Core Returned</option>
+                                                    <option value="CORE1">Core Returned</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                        </td>
+                                        <td>
+                                            <div class="redText" *ngIf="Cart.isSpecialPricing">Special Sale Price</div>
+                                            <div [ngClass]="Cart.isSpecialPricing? 'redText':''">
+                                                <span *ngIf="Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                    {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}} <br />
+                                                    <span>orig. {{Cart.listPrice==null?"0":Cart.listPrice|currency:'USD': true:'1.2-2'}}</span>
+                                                    <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                </span>
+                                                <span *ngIf="!Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                    {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                    <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                </span>
+                                            </div> <a *ngIf="!Cart.isBuyout" class="btn price-tag pull-left" data-toggle="modal" data-target="#priceoverrideOnCart" (click)="priceOverride(Cart)" style="margin-left:5px;"></a>
+                                            <i class="fa fa-ticket coupon" *ngIf="Cart.hasCoupon" title="Part is eligible for coupon" style="font-size: 16px;"></i>
+                                        </td>
+
+                                        <td>
+                                            <div class="col-md-12 padding-0">
+                                                <select class="form-control" id="cartItemHotFlag" name="cartItemHotFlag" [ngModel]="Cart.hotFlagCode" (change)="onChangeCartItemsHotFlag(Cart, cartItemHotFlag.value)" #cartItemHotFlag>
+                                                    <option value="{{flag.code}}" *ngFor="let flag of hotFlags;">{{flag.code+" - "+ flag.description}}</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="quantity" style="font-weight:normal">
+                                            <div class="range-text-box" style="padding-right:28px;">
+                                                <input style="width:100%" class="form-control pull-left right-text-align" type="text" [(ngModel)]="Cart.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(Cart,$event)" autofocus (focusout)="onQuantityFocusout(Cart,$event);" />
+                                                <div class="renge-top" (click)="Cart.quantity=(Cart.quantity*1)+1;updateCartItems(Cart)">&nbsp;</div>
+                                                <div class="renge-down" (click)="Cart.quantity=(Cart.quantity*1)>1?Cart.quantity-1:1;updateCartItems(Cart)">&nbsp;</div>
+                                            </div>
+                                            <br /><br />
+                                            <div *ngIf="!Cart.isSplit">{{Cart.quantityAvailable}} at {{branchCode}} {{branchCity}}</div>
+                                            <div *ngIf="Cart.isSplit"> 0 at {{branchCode}} {{branchCity}}</div>
+                                        </td>
+                                        <td class="text-align-right" style="font-weight:normal" align="right">
+                                            <span>{{Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))==null?"0":Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))|currency:'USD': true:'1.2-2'}}</span> <a class="btn price-verify-icon" style="cursor:default" *ngIf="Cart.isPriceVerified">v</a>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- HotFlag End -->
+                        <!-- STO Start -->
+                        <div *ngIf="stockTransferData && stockTransferData != undefined && stockTransferData != null && stockTransferData.length > 0">
+                            <div class="row-heading">STOCK TRANSFER ORDER</div>
+                            <table class="table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;">Items</th>
+                                        <th style="width: 180px;">Part Number</th>
+                                        <th style="width: 222px;">Item</th>
+                                        <th style="width: 185px;">Unit Price</th>
+                                        <th width="220px">Transfer From</th>
+                                        <th style="width:200px">Quantity</th>
+                                        <th class="text-align-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let Cart of stockTransferData;">
+                                        <td>
+                                            <div class="checkbox">
+                                                <input type="checkbox" name="field" value="option" [(ngModel)]="Cart.selected" (change)="onCartItemSelectionChange(Cart,Cart.selected)">
+                                                <label><span><span></span></span> </label>
+                                            </div>
+                                        </td>
+                                        <td style="font-weight:normal">
+                                            <a class="hyperlink" *ngIf="!Cart.isBuyout" [routerLink]="['/parts']" [queryParams]="{searchTerm:Cart.partNumber,partId:Cart.partId}">
+                                                {{Cart.partNumber}}<br />
+                                            </a>
+                                            <span *ngIf="Cart.isBuyout">{{Cart.partNumber}}<br /></span>
+                                            <span *ngIf="Cart.binLocation"> BIN: {{Cart.binLocation}}</span>
+                                        </td>
+                                        <td style="font-weight:normal">
+
+                                            {{Cart.description}}
+
+                                            <div *ngIf="Cart.corePrice>0" style="font-weight:normal">
+                                                <select class="form-control core-options" #myCartCoreOption (change)="updateCartItems(Cart)" [(ngModel)]="Cart.coreOption" style="width: 115px;">
+                                                    <option value="NOCORER" selected>No Core Returned</option>
+                                                    <option value="CORE1">Core Returned</option>
+                                                </select>
+                                            </div>
+                                            <br>
+                                        </td>
+                                        <td>
+                                            <div class="redText" *ngIf="Cart.isSpecialPricing">Special Sale Price</div>
+                                            <div [ngClass]="Cart.isSpecialPricing? 'redText':''">
+                                                <span *ngIf="Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                    {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}} <br />
+                                                    <span>orig. {{Cart.listPrice==null?"0":Cart.listPrice|currency:'USD': true:'1.2-2'}}</span>
+                                                    <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                </span>
+                                                <span *ngIf="!Cart.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                    {{Cart.finalPrice==null?"0":Cart.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                    <span *ngIf="Cart.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': Cart.coreOption == 'CORE1'}" style="width: 70px;">{{Cart.corePrice==null?"0":Cart.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                </span>
+                                            </div> <a *ngIf="!Cart.isBuyout" class="btn price-tag pull-left" data-toggle="modal" data-target="#priceoverrideOnCart" (click)="priceOverride(Cart)" style="margin-left:5px;"></a>
+                                            <i class="fa fa-ticket coupon" *ngIf="Cart.hasCoupon" title="Part is eligible for coupon" style="font-size: 16px;"></i>
+                                        </td>
+
+                                        <td>
+                                            {{Cart.vendorCode | customerNumberFilter}}{{" - " + Cart.vendorName}}
+                                        </td>
+                                        <td class="quantity" style="font-weight:normal">
+                                            <div class="range-text-box" style="padding-right:28px;">
+                                                <input style="width:100%" class="form-control pull-left right-text-align" type="text" [(ngModel)]="Cart.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(Cart,$event)" autofocus (focusout)="onQuantityFocusout(Cart,$event);" />
+                                                <div class="renge-top" (click)="Cart.quantity=(Cart.quantity*1)+1;updateCartItems(Cart)">&nbsp;</div>
+                                                <div class="renge-down" (click)="Cart.quantity=(Cart.quantity*1)>1?Cart.quantity-1:1;updateCartItems(Cart)">&nbsp;</div>
+                                            </div>
+                                            <br /><br />
+                                            <div *ngIf="!Cart.isSplit">{{Cart.quantityAvailable}} at {{Cart.vendorCode | customerNumberFilter}} {{Cart.vendorBranchCity}}</div>
+                                            <div *ngIf="Cart.isSplit && Cart.branchCode!=(Cart.vendorCode | customerNumberFilter)"> 0 at {{Cart.vendorCode | customerNumberFilter}} {{Cart.vendorBranchCity}}</div>
+                                        </td>
+                                        <td class="text-align-right" style="font-weight:normal" align="right">
+                                            <span>{{Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))==null?"0":Cart.quantity * (Cart.finalPrice+(Cart.coreOption=="CORE1" || Cart.coreOption == null ?0: Cart.corePrice))|currency:'USD': true:'1.2-2'}}</span> <a class="btn price-verify-icon" style="cursor:default" *ngIf="Cart.isPriceVerified">v</a>
+
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- STO End -->
+                        <hr />
+                        <div class="col-md-6">
+                            <div *ngIf="!isCouponSelected" class="col-xs-12">
+                                <form class="form-inline" class="col-xs-6">
+                                    <div class="form-group" style="    position: relative;">
+                                        <label for="exampleInputEmail1">Enter Coupon Code For Validation</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="txtcouponId" name="txtcouponId" #txtcouponId placeholder="Enter coupon code ..." maxlength="128" [(ngModel)]="couponCodeSearchTerm">
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-default yellow-btn" (click)="searchCoupons();" style="padding: 5px 5px;">Search</button>
+                                            </span>
+
+                                            <span class="countLoader mycart-copun-Loader" *ngIf="isProcessingCoupon"></span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table" *ngIf="((cartsData && cartsData != undefined && cartsData != null && cartsData.length > 0) || (partsBuyOutData && partsBuyOutData != undefined && partsBuyOutData != null && partsBuyOutData.length > 0) || (hotFlagData && hotFlagData != undefined && hotFlagData != null && hotFlagData.length > 0) || (stockTransferData && stockTransferData != undefined && stockTransferData != null && stockTransferData.length > 0))">
+                                <thead>
+                                    <tr>
+                                        <td width="100px"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="bold-font quantity">Subtotal</td>
+                                        <td style="width: 90px;" class="bold-font text-align-right" align="right">{{calculateCartTotals()|currency:'USD': true:'1.2-2'}}</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <button class="btn btn-default yellow-btn btn-width-160 margin-t-10 pull-left margin-r-5" (click)="checkout();">Checkout</button>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Confirmation Price Adjustment-->
+<div class="modal fade bs-example-modal-sm" id="confirmationPriceAdjustment" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <br />
+            <div class="modal-body customer-table">
+                {{this.priceAdjustmentMessage}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" data-dismiss="modal" (click)="onPriceAdjustmentConfirmationYes()">Yes</button>
+                <button type="button" class="btn yellow-btn" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Confirmation Price Adjustment-->
+<!--Price Override-->
+<div class="modal fade bs-example-modal-sm cart-price-override" id="priceoverrideOnCart" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1" style="margin-right: -23px; margin-top: -32px;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body customer-table">
+                <form #PriceAdjustmentForm="ngForm">
+                    <label style="color:#8e8e8e">Customer's Price</label><br />
+                    <span class="form-control pull-left">{{listPrice == null ? "0" : listPrice | currency:'USD': true:'1.2-2'}}</span>
+                    <label style="color:#8e8e8e;padding-top:7px;">Adjusted Price</label><br />
+                    <input tabindex="0" class="form-control pull-left" type="text" (click)="hidenotification()" [(ngModel)]="adjustedPriceValue" autofocus #adjustedPrice="ngModel" id="adjustedPrice" name="adjustedPrice" pattern="-?(?:\d*\.)?\d+" required>
+                    <label style="color:#8e8e8e">Select Reason</label><br />
+                    <select class="form-control" [ngModel]="selectedAdjustedPriceReason" (ngModelChange)="onChangePriceOverride($event)" #adjustedPriceReason id="adjustedPriceReason" name="adjustedPriceReason">
+                        <option value="0">Competitive</option>
+                        <option value="1">Incorrect in system</option>
+                        <option value="2">Marketing</option>
+                        <option value="3">Contract Price</option>
+                    </select>
+                    <button type="submit" class="btn btn-default yellow-btn margin-t-10 form-control" (click)="setCartAdjustedPrice(adjustedPrice.value,adjustedPriceReason.value)" [disabled]="!adjustedPrice.valid">Adjust Price</button><br />
+                    <!--<button type="submit" class="btn btn-default black-btn margin-t-10 form-control" (click)="clrPriceOverride()">Cancel</button>-->
+                    <button type="submit" class="btn btn-default black-btn margin-t-10 form-control" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Price Override end-->
+
+<!-- Known Part buyout Popup -->
+<known-part-buyout #knownPartBuyout></known-part-buyout>
+<!-- end Known Part buyout -->
+
+<!-- HotFlag Popup -->
+<hot-flag #hotFlag [hot-flags]="hotFlags" ></hot-flag>
+<!-- end HotFlag Popup-->
+
+<!-- StockTransfer Popup -->
+<stock-transfer #stockTransfer ></stock-transfer>
+<!-- end StockTransfer Popup-->
+
+<!-- start Price Verify-->
+<price-verify #priceVerify (callbackMscPriceVerified)="onMscPriceVerified($event,data)"></price-verify>
+<!-- end Price Verify-->
+
+<!-- start PricingAlert Popup-->
+<div class="modal fade bs-example-modal-sm " id="pricingAlertPopup" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="margin-top:10%;">
+
+    <div class="modal-dialog modal-sm modal-header-close-btn" role="document" style="padding: 20px 10px;background: #f5f5f5; width:30%">
+        <button aria-label="Close" class="close" data-dismiss="modal" tabindex="-1" type="button"><span aria-hidden="true">×</span></button>
+        <div class="modal-content price-verify">
+            <div class="modal-body customer-table">
+                <b>Pricing Alert</b>
+            </div>
+            <div style=" text-align:left; width:90%; margin:10px auto;">
+                <div class="form-group">
+                    Those parts which have "V" icon next to their price in the Total Column have been verified for MSC or Fleet Charge Pricing. Not all parts in cart may be eligible or verified for this pricing.
+                </div>
+                <div class="form-group" style=" text-align:center;">
+                    <div class="pricing-alert-div">
+
+                        <input type="checkbox" class="pricing-alert-checkbox" [(ngModel)]="doNotShowPricingAlert">
+                        <span style="position: relative;  top: -5px;">
+                            I got it, don't show this message again.
+                        </span>
+
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default yellow-btn " style="width:50%; margin:0 auto; display: block;" (click)="hidePricingAlertPopup();">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end PricingAlert Popup-->
+
+<div class="modal fade bs-example-modal-md" id="searchedCouponDataModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+                <!--<h4 class="modal-title" id="myModalLabel">Coupon For Default Customer</h4>-->
+            </div>
+            <div class="modal-body" style="overflow:auto; min-height: 150px;padding: 0px 0 15px 0;">
+                <div id="divSearchedCouponData" class="col-md-10 col-md-offset-1">
+                    <form>
+                        <div class="row">
+                            <div class="form-group" *ngIf="searchedCouponData!=null && searchedCouponData!=undefined">
+                                <h4>Step 1: Verify Contact or Customer Information</h4>
+                                <span>If the customer does not have the coupon in-hand, they should give their contact information or customer information for verification.</span>
+                                <br />
+                                <br />
+                                <span><b>Contact Information:</b></span><br />
+                                <span>{{searchedCouponData.customerName}}</span><br />
+                                <span>{{searchedCouponData.customerTelephone | telephoneNumber}}</span>
+                                <br />
+                                <br />
+                                <span><b>Customer Information:</b></span><br />
+                                <span>{{searchedCouponData.customerCompanyName}}</span><br />
+                                <span>{{searchedCouponData.customerAddress}}</span><br />
+                                <span>{{searchedCouponData.customerCity}}, {{searchedCouponData.customerState}} {{searchedCouponData.customerPostalCode | postalCode}}</span><br />
+                                <br />
+                                <h4>Step 2: Apply Coupon to Cart</h4>
+                                <button type="button" class="btn btn-md yellow-btn" id="btnYes" (click)="addCouponToCart()">Apply Coupon</button>
+                                <button type="button" class="btn btn-md white-btn" id="btnNo" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

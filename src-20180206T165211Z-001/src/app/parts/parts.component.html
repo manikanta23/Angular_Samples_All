@@ -1,0 +1,13 @@
+﻿<div *ngIf="!partsData">
+    <h5>loading part(s) ...</h5>
+</div>
+<div *ngIf="partsData != null && partsData.parts.length > 0">
+    <!--<div *ngIf="partsData.parts == null || partsData.parts.length < 1">
+        <h3>Part not found.</h3>
+    </div>-->
+    <div *ngIf="partsData.parts != null && partsData.parts.length > 0">
+        <parts-list [customerDataOnCustomerChange]="customerDataOnCustomerChange" [(isBranchChanged)]="isBranchChanged" [(isCustomerChanged)]="isCustomerChanged" [branchDataUpdated]="branchDataUpdated" [partSearchTerm]="partSearchTerm" [parts]="partsData" *ngIf="partsData.parts.length > 1" [refineSearch]="refineSearchData" (callBackRefineSearch)="onRefineSearchCheck($event,inputData)"></parts-list>
+        <parts-details [customerDataOnCustomerChange]="customerDataOnCustomerChange" [(isBranchChanged)]="isBranchChanged" [(isCustomerChanged)]="isCustomerChanged" [branchDataUpdated]="branchDataUpdated" [partSearchTerm]="partSearchTerm" [part-detail]="partsData" *ngIf="partsData.parts.length == 1"></parts-details>
+    </div>
+</div>
+

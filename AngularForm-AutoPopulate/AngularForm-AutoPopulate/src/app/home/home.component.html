@@ -1,0 +1,6 @@
+<div class="col-md-12">
+  <label for="typeahead">Search for a state:</label>
+  <input id="typeahead" type="text" class="form-control" [(ngModel)]="model"  [ngbTypeahead]="search" [inputFormatter]="formatter"  />
+  <hr>
+  <pre>Model: {{ model | json }}</pre>
+</div>

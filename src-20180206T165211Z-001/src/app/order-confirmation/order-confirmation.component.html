@@ -1,0 +1,352 @@
+﻿ <!--Nav Start-->
+<div *ngIf="order">
+    <div>
+        <div class="oredr-holder">
+            <div class="col-sm-12 col-md-12 col-lg-12 top-title">
+                <a style="color:black" *ngIf="order.orderType=='0'">Your order has been placed!</a> <a style="color:black" *ngIf="order.orderType=='1'">Your quote has been placed!</a><span class="order-number">
+                    <a style="color:black" *ngIf="order.orderType=='0'"> Order confirmation </a> <a style="color:black" *ngIf="order.orderType=='1'"> Quote confirmation </a><a style="cursor:pointer" class="hyperlink" href="/views/Order/GetSapOrderLink?sapOrderNo={{order.sapOrderNo}}"><b>#{{order.sapOrderNo}}</b> </a>
+                    <!--<a style="cursor:pointer" class="hyperlink" (click)="downloadSAPShortCut()"><b>#{{order.sapOrderNo}}</b> </a>-->
+                    <a class="upload-icon" style="cursor:pointer" (click)="copyToClipBoard(order.sapOrderNo)"></a>
+                </span>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                <div class="col-sm-12 col-md-7 col-lg-7">
+                    <div class="row" *ngIf="orderItems == null">
+                        <h5>loading order items...</h5>
+                    </div>
+                    <div class="billing-table table-responsive">
+                        <div class="billing-right">
+                            <h2>My Order</h2>
+                            <span class="pull-left" *ngIf="cartCount">{{cartCount}} {{(cartCount==1 || cartCount==0)? 'ITEM' :'ITEMS'}} </span>
+                        </div>
+                        <div class="order-confirmation-table-scroll table-responsive my-cart-list-table">
+                            <!-- Known Parts Start -->
+                            <table class="table" *ngIf="orderItems && orderItems != undefined && orderItems != null && orderItems.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;"><b>Part #</b></th>
+                                        <th style="width: 150px;"><b>Item</b></th>
+                                        <th style="width: 50px;" class="text-align-right"><b>Quantity</b></th>
+                                        <th style="width: 50px;" class="text-align-right"><b>Total</b></th>
+                                        <th style="width: 50px;" class="text-align-right"><b>Job #</b></th>
+                                    </tr>
+                                </thead>
+                                <tbody *ngFor="let orderItem of orderItems;">
+                                    <tr>
+                                        <td>{{orderItem.partNumber}}</td>
+                                        <td>
+                                            {{orderItem.description}}<br>
+                                            <span *ngIf="orderItem.corePrice>0" style="margin:0;">{{orderItem.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</span>
+                                        </td>
+                                        <td class="right-text-align">{{orderItem.quantity}}</td>
+                                        <td class="text-align-right">
+                                            <div class="redText" *ngIf="orderItem.isSpecialPricing">Special Sale Price</div>
+                                            <span [ngClass]="orderItem.isSpecialPricing? 'redText':''">
+                                                <!--{{orderItem.extendedPrice}}-->
+                                                {{(orderItem.quantity  * (orderItem.finalPrice + (orderItem.coreOption=="CORE1" || orderItem.coreOption==null? 0: orderItem.corePrice)))==null?"0":(orderItem.quantity * (orderItem.finalPrice+(orderItem.coreOption=="CORE1" || orderItem.coreOption==null ?0: orderItem.corePrice)))|currency:'USD': true:'1.2-2'}}
+                                            </span>
+                                        </td>
+                                        <td class="right-text-align">{{orderItem.jobNumber}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-- Known Parts End -->
+                            <!-- Parts BuyOut Start -->
+                            <div *ngIf="partsBuyOutData && partsBuyOutData != undefined && partsBuyOutData != null && partsBuyOutData.length > 0">
+                                <div class="row-heading">PARTS BUYOUT</div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 20px;"><b>Part #</b></th>
+                                            <th style="width: 170px;"><b>Item</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Quantity</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Total</b></th>
+                                            <th style="width: 60px;" class="text-align-right"><b>Job #</b></th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngFor="let orderItem of partsBuyOutData;">
+                                        <tr>
+                                            <td>{{orderItem.partNumber}}</td>
+                                            <td>
+                                                {{orderItem.description}}<br>
+                                                <span *ngIf="orderItem.corePrice>0" style="margin:0;">{{orderItem.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.quantity}}</td>
+                                            <td class="text-align-right">
+                                                <div class="redText" *ngIf="orderItem.isSpecialPricing">Special Sale Price</div>
+                                                <span [ngClass]="orderItem.isSpecialPricing? 'redText':''">
+                                                    <!--{{orderItem.extendedPrice}}-->
+                                                    {{(orderItem.quantity  * (orderItem.finalPrice + (orderItem.coreOption=="CORE1" || orderItem.coreOption==null? 0: orderItem.corePrice)))==null?"0":(orderItem.quantity * (orderItem.finalPrice+(orderItem.coreOption=="CORE1" || orderItem.coreOption==null ?0: orderItem.corePrice)))|currency:'USD': true:'1.2-2'}}
+                                                </span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.jobNumber}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Parts BuyOut  End -->
+                            <!-- HotFlag Start -->
+                            <div *ngIf="hotFlagData && hotFlagData != undefined && hotFlagData != null && hotFlagData.length > 0">
+                                <div class="row-heading">HOTFLAG</div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;"><b>Part #</b></th>
+                                            <th style="width: 150px;"><b>Item</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Quantity</b></th>
+                                            <th style="width: 110px;" class="text-align-right"><b>Total</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Job #</b></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngFor="let orderItem of hotFlagData;">
+                                        <tr>
+                                            <td>{{orderItem.partNumber}}</td>
+                                            <td>
+                                                {{orderItem.description}}<br>
+                                                <span *ngIf="orderItem.corePrice>0" style="margin:0;">{{orderItem.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.quantity}}</td>
+                                            <td class="text-align-right">
+                                                <div class="redText" *ngIf="orderItem.isSpecialPricing">Special Sale Price</div>
+                                                 <span [ngClass]="orderItem.isSpecialPricing? 'redText':''">
+                                                    <!--{{orderItem.extendedPrice}}-->
+                                                    {{(orderItem.quantity  * (orderItem.finalPrice + (orderItem.coreOption=="CORE1" || orderItem.coreOption==null? 0: orderItem.corePrice)))==null?"0":(orderItem.quantity * (orderItem.finalPrice+(orderItem.coreOption=="CORE1" || orderItem.coreOption==null ?0: orderItem.corePrice)))|currency:'USD': true:'1.2-2'}}
+                                                 </span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.jobNumber}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- HotFlag End -->
+                            <!-- STO Start -->
+                            <div *ngIf="stockTransferData && stockTransferData != undefined && stockTransferData != null && stockTransferData.length > 0">
+                                <div class="row-heading" style="float:left; width:100%;">
+                                    <span style="float:left">STOCK TRANSFER ORDER</span>
+                                    <span style="float:right">Purchase Order will be created for the below items. </span>
+                                </div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;"><b>Part #</b></th>
+                                            <th style="width: 150px;"><b>Item</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Quantity</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Total</b></th>
+                                            <th style="width: 50px;" class="text-align-right"><b>Job #</b></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody *ngFor="let orderItem of stockTransferData;">
+                                        <tr>
+                                            <td>{{orderItem.partNumber}}</td>
+                                            <td>
+                                                {{orderItem.description}}<br>
+                                                <span *ngIf="orderItem.corePrice>0" style="margin:0;">{{orderItem.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.quantity}}</td>
+                                            <td class="text-align-right">
+                                                <div class="redText" *ngIf="orderItem.isSpecialPricing">Special Sale Price</div>
+                                                <span [ngClass]="orderItem.isSpecialPricing? 'redText':''">
+                                                    <!--{{orderItem.extendedPrice}}-->
+                                                    {{(orderItem.quantity  * (orderItem.finalPrice + (orderItem.coreOption=="CORE1" || orderItem.coreOption==null? 0: orderItem.corePrice)))==null?"0":(orderItem.quantity * (orderItem.finalPrice+(orderItem.coreOption=="CORE1" || orderItem.coreOption==null ?0: orderItem.corePrice)))|currency:'USD': true:'1.2-2'}}
+                                                </span>
+                                            </td>
+                                            <td class="right-text-align">{{orderItem.jobNumber}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- STO End -->
+                        </div>
+                        <hr />
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;"></th>
+                                    <th style="width: 50px;"></th>
+                                    <th style="width: 50px;"></th>
+                                    <th style="width: 50px;" style="text-align:right" class="bold-font">Subtotal</th>
+                                    <th style="width: 50px;" style="text-align:right; width:80px;" class="bold-font">{{calculateCartTotals()|currency:'USD': true:'1.2-2'}}</th>
+                                    <th style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr [hidden]="!showFrieghtRow">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right" width="100px">
+                                        Estimated freight
+                                    </td>
+                                    <td style="text-align:right" class="text-align-right">{{estimatedFrieght|currency:'USD': true:'1.2-2'}}</td>
+                                    <td></td>
+                                </tr>
+
+                                <tr [hidden]="!showDeliveryRow">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right" width="100px">
+                                        Estimated delivery
+                                    </td>
+                                    <td style="text-align:right" class="text-align-right">{{estimatedDelivery|currency:'USD': true:'1.2-2'}}</td>
+                                    <td></td>
+                                </tr>
+
+                                <!-- Temporary commented till the implementation logic is clear -->
+                                <!--<tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right">
+                                        Addt'l delivery charge
+                                    </td>
+                                    <td style="text-align:right" class="text-align-right">$25.95</td>
+                                </tr>-->
+
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right" class="bold-font">
+                                        TOTAL
+                                    </td>
+                                    <td style="text-align:right" class="text-align-right bold-font">{{total |currency:'USD': true:'1.2-2'}}</td>
+                                    <td></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--<div class="col-sm-12 col-md-1 col-lg-1 text-align-left"></div>-->
+                <div class="col-sm-12 col-md-5 col-lg-5 text-align-left">
+                    <div class="row" *ngIf="order == null">
+                        <h5>loading order details...</h5>
+                    </div>
+                    <table class="table order">
+                        <tr>
+                            <td style="text-align:right"><h1>Billing:</h1></td>
+                            <td class="order-billing-summary-text">
+                                {{order.billingType}}
+                                <br />PO # {{order.poNumber !="" && order.poNumber !=null?order.poNumber:"Not available"}}
+                                <br />Unit Number # {{order.unitNumber !="" && order.unitNumber !=null?order.unitNumber:"Not available"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right"><h1>Delivery:</h1></td>
+                            <td class="order-billing-summary-text">
+                                {{deliveryOption}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right"><h1>Alternate Shipping Address:</h1></td>
+                            <td class="order-billing-summary-text">
+                                {{order.name1}}
+                                <br />{{order.address}}
+                                <br />{{order.city}} , {{order.state}} {{order.zip}}
+                                <br />{{order.phone}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right"><h1> Salesperson:</h1></td>
+                            <td class="order-billing-summary-text">
+                                {{order.salesPerson != null && order.salesPerson != '' ? order.salesPerson : "Not available"}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right"><h1>Special Instructions:</h1></td>
+                            <td class="order-billing-summary-text">
+                                {{order.specialInstructions==""? "None" : order.specialInstructions}}
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12 order-confirmation-btn">
+                <button type="button" class="btn btn-default yellow-btn" [disabled]="createBillingFlag" *ngIf="order.orderType=='1'" (click)="printSAPQuote()">Print Quote</button>
+                <span >
+                    <button type="button" class="btn btn-default yellow-btn" [disabled]="createBillingFlag || printPOFlag" *ngIf="order.orderType=='0' && (partsBuyOutData.length > 0 || stockTransferData.length > 0)" (click)="downloadPurchaseOrder()">Create PO</button>
+                    <span *ngIf="order.orderType=='0' && (partsBuyOutData.length > 0 || stockTransferData.length > 0)">Or</span>                    
+                    <button type="button" class="btn btn-default yellow-btn" [disabled]="createBillingFlag || printPickTicketFlag" *ngIf="order.orderType=='0'" (click)="getPickTicket()">Print Pick Ticket</button>
+                    <span *ngIf="order.orderType=='0'">Or</span>
+                    <button type="button" class="btn btn-default yellow-btn" [disabled]="createBillingFlag" *ngIf="order.orderType=='0'" (click)="downloadInvoice()">Create Billing</button>
+                </span>
+                <span>
+                    <a class="margin-t-10 hyperlink margin-l-r-10" (click)="clearCustomerValue()" style="cursor:pointer" href="#">New Search</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-md" id="orderConfirmationMessage" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding:5px">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body customer-table" style="text-align:center; margin-bottom:60px;">
+                <a class="fa fa-check-circle" *ngIf="orderConfirmationFlag==true" style="color:green; font-size: 25px; line-height:50px;" aria-hidden="true"></a>
+                <a class="fa fa-exclamation-circle" *ngIf="orderConfirmationFlag==false" style="color:red; font-size: 25px; line-height:50px;" aria-hidden="true"></a><br />
+                <b style="font-weight:bold;font-size: 16px;">{{orderConfirmationMessage}}</b>
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bs-example-modal-md" id="createBillingModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-md" role="dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="-1"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" style="overflow:auto; min-height: 152px;padding: 0px 0 15px 0;">
+                <div id="divCreateBilling" class="createBilling  col-md-10 col-md-offset-1">
+                    <div *ngFor="let errMsg of createBillingErrorMsgs">
+
+                        <div class=" alert" [ngClass]="errMsg.type == 5 ? 'alert-multi-line'
+                                : errMsg.type == 0 ? 'alert-success'
+                                : errMsg.type == 1 ? 'alert-info'
+                                : errMsg.type == 2 ? 'alert-warning' : 'alert-danger'"
+                             style="margin-bottom: 5px;">
+                            <i class="fa" id="notificationIcon"
+                               [ngClass]="errMsg.type == 5 ? ''
+                             : errMsg.type == 0 ? 'fa fa-check-circle success'
+                            : errMsg.type == 1 ? 'fa fa-exclamation-triangle info'
+                            : errMsg.type == 2 ? 'fa fa-exclamation-triangle warning'
+                            : errMsg.type == 3 ? 'fa fa-times-circle danger'
+                            : 'fa fa-exclamation-circle danger'"></i>
+                            &nbsp;
+                            <span [ngClass]="errMsg.type == 5 ? ''
+                                : errMsg.type == 0 ? 'success'
+                                : errMsg.type == 1 ? 'info'
+                                : errMsg.type == 2 ? 'warning' : 'danger'">{{errMsg.message}}</span><br />
+                        </div>
+                    </div><br />
+                    <form>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="form-inline">
+                                    <label class="sub-title create-billing-subtitle" style=" padding-left: 16px;">IBS/MSC Authorization Number</label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input id="txtAuthorizationNo" class="form-control" type="text" [(ngModel)]="authorizationNumber" name="authorizationNumber" maxlength="10" (keypress)="onCreateBillingKeypress($event)">
+                                </div>
+                                <div class="col-sm-6">
+                                    <button type="button" class="btn btn-md black-text btnBg yellow-btn" id="btnSubmitCreateBilling" [disabled]="!authorizationNumber" (click)="submitIBSOverrideCreateBilling()" data-dismiss="modal">Submit Override & Create Billing</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

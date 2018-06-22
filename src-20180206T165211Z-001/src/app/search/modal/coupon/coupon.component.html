@@ -1,0 +1,145 @@
+﻿<!--Coupon Modal Box Start -->
+<div class="modal fade bs-example-modal-lg" id="couponModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title pull-left" id="myModalLabel">Coupons</h4>
+                <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                    <!--<input type="text" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search Your Coupons…">
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>-->
+                </div>
+            </div>
+            
+            <div *ngIf="isProcessing" class="col-xs-12">
+                <div class="modal-body padding-0" *ngIf="!coupons">
+                    <h5 >loading coupon(s) ...</h5>
+                </div>
+                <div class="modal-body  padding-0" *ngIf="coupons">
+                    <div *ngIf="coupons.length < 1"><h3 class="col-xs-12"> No records found.</h3></div>
+                    <div *ngIf="coupons.length > 0" class="favorites-customer-list" style="padding-bottom:15px;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <a role="button">
+                                            Name
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Code
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Customer
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Customer Information
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Valid From <br />
+                                            Valid To
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Min Qualifying<br />
+                                            Products Total ($)
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Discount ($)
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a role="button">
+                                            Status
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let coupon of coupons" (click)="onSelectCoupon(coupon);" [ngClass]="{'highlighted': coupon.isSelected, '': !coupon.isSelected,'disabledresult': coupon.couponMaxRedemptions > 0 && coupon.couponMaxRedemptions <= coupon.couponClaimedRedemptions}" style="cursor:pointer">
+                                    <td scope="row">
+                                        <div>
+                                            <span>{{coupon.couponName}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span>{{coupon.couponCode}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span>{{coupon.customerName}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span>{{coupon.customerAddress}}</span><br />
+                                            <span>{{coupon.customerCity}}, {{coupon.customerState}} {{coupon.customerZip | postalCode}}</span><br />
+                                            <span>{{coupon.customerTelephone | telephoneNumber}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span>{{coupon.couponStartDate | date}}</span><br />
+                                            <span>{{coupon.couponEndDate | date}}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{coupon.couponMinCartDollarsRequired}}
+                                    </td>
+                                    <td>
+                                        {{coupon.couponDiscountFlatAmount}}
+                                    </td>
+                                    <td>
+                                        <span class="greenText" *ngIf="coupon.couponIsRedeemable">
+                                            Redeemable
+                                        </span>
+                                        <span class="greenText" *ngIf="coupon.couponMaxRedemptions > 0 && coupon.couponMaxRedemptions <= coupon.couponClaimedRedemptions">
+                                            Used 
+                                        </span>
+                                        <!--<span class="redText" *ngIf="!coupon.couponIsRedeemable">
+                                            {{ coupon.minRequiredCartTotalShortValue | currency:'USD': true:'1.2-2'}}  Short
+                                        </span>-->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" (click)="showConfirmation();" [disabled]="!hasCouponSelected">Select Coupon</button>
+                <button type="button" class="btn btn-default white-btn" data-dismiss="modal">Don't Use a Coupon</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Coupon Modal Box End -->
+<!--Coupon Confirmation Modal Box-->
+<div class="modal fade bs-example-modal-sm" id="couponConfirmation" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body customer-table">
+                <span *ngIf="couponRow != undefined && couponRow != null">You have selected coupon {{couponRow.couponName}}<span *ngIf="couponRow.couponCode != undefined && couponRow.couponCode != null && couponRow.couponCode != ''">{{'(' + couponRow.couponCode + ')'}})</span>. Do you want to continue?</span>
+                <span *ngIf="couponRow == undefined || couponRow == null || couponRow == ''">You have not selected any coupon. Do you want to continue?</span>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" data-dismiss="modal" (click)="couponApplyYes();">Yes</button>
+                <button type="button" class="btn yellow-btn" (click)="couponApplyNo();" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Coupon Confirmation Modal Box-->

@@ -1,0 +1,127 @@
+﻿<div class="coupon-file-import padding-t-b-15">
+    <div class="title-of-box-hold">
+        <div class="title-of-box pull-left">Coupon File Import Summary</div>
+    </div>
+    <div *ngIf="!couponsPermissions || !couponsPermissions.hasImportCouponsPermissions" style="padding: 15px;">
+        <h4>You do not have coupon import permission.</h4>
+    </div>
+    <div *ngIf="(couponsPermissions && couponsPermissions.hasImportCouponsPermissions) && (dataLoadMessage)" style="padding: 15px;">
+        <h5>
+            {{dataLoadMessage}}
+            <span class="countLoader" *ngIf="isDataLoading"></span>
+        </h5>
+    </div>
+    <div *ngIf="(couponsPermissions && couponsPermissions.hasImportCouponsPermissions) && (!dataLoadMessage)" style="padding: 15px 0px;">
+        <div class="col-md-12">
+            <a role="button" [routerLink]="['/coupon']" class="right-text-align hyperlink" style="margin: 7px 10px 0 0px;">Upload Coupon File</a>
+            <a role="button" [routerLink]="['/couponManagement']" class="hyperlink" style="margin: 7px 10px 0 0px;">Coupon Management</a>
+
+            <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                <input type="text" id="searchId" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search…">
+                <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="coupon-file-import-summary-header" class="col-md-12">
+                <div class="col-sm-1">
+                    <a role="button" id="btnRefreshSummary" (click)="getCouponFileImportsSummary();"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                </div>
+                <div class="col-sm-7">
+                    <a role="button" class="hyperlink" (click)="sortDataBy('fileName');">
+                        <b>File Name</b>
+                        <span [hidden]="sortBy != 'fileName'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'fileName' && sortAsc, 'fa-caret-down': sortBy == 'fileName' && !sortAsc}"> </span>
+                    </a>
+                </div>
+                <div class="col-sm-2">
+                    <a role="button" class="hyperlink" (click)="sortDataBy('createdOn');">
+                        <b>Created On</b>
+                        <span [hidden]="sortBy != 'createdOn'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'createdOn' && sortAsc, 'fa-caret-down': sortBy == 'createdOn' && !sortAsc}"> </span>
+                    </a>
+                </div>
+                <div class="col-sm-2">
+                    <a role="button" class="hyperlink" (click)="sortDataBy('status');">
+                        <b>Status</b>
+                        <span [hidden]="sortBy != 'status'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'status' && sortAsc, 'fa-caret-down': sortBy == 'status' && !sortAsc}"> </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="coupon-file-import-summary" class="col-md-12">
+            <accordion [showArrows]="false" [closeOthers]="true">
+                <accordion-group (onToggle)="onToggleAccordion(item)" *ngFor="let item of pagedFiletems;let i=index">
+                    <accordion-heading>
+                        <div class="col-sm-1">
+                            <accordion-toggle>
+                                <i class="fa fa-chevron-down" style="cursor:pointer" *ngIf="!item.isOpened" aria-hidden="true"></i>
+                                <i class="fa fa-chevron-up" style="cursor:pointer" *ngIf="item.isOpened" aria-hidden="true"></i>
+                            </accordion-toggle>
+                        </div>
+                        <div class="col-sm-7">
+                            {{item.fileName}}
+                        </div>
+                        <div class="col-sm-2">
+                            {{item.createdOn | date :  "MM/dd/yyyy hh:mm a"}}
+                        </div>
+                        <div class="col-sm-2">
+                            {{item.status}}
+                        </div>
+                    </accordion-heading>
+
+                    <div class="card-body">
+                        <div class="col-lg-12">
+                            <div *ngIf="item.status=='Uploaded'">
+                                <p class="text-success">
+                                    File has been uploaded successfully, it will be processed soon. Please click on refresh button (<a role="button" id="btnRefreshSummary" (click)="getCouponFileImportsSummary();"><i class="fa fa-refresh" aria-hidden="true"></i></a>).
+                                </p>
+                            </div>
+
+                            <div *ngIf="item.status!='Uploaded'">
+                                <p class="text-success">
+                                    {{item.SuccessMessage}}
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="alert alert-multi-line" *ngIf="item.couponFileImportsErrors && item.couponFileImportsErrors.length>0">
+                                <div *ngFor="let msg of item.couponFileImportsErrors;">
+                                    <span class="danger">
+                                        {{msg.errorMessage}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </accordion-group>
+            </accordion>
+        </div>
+        <div class="col-md-12">
+            <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                <div class="pull-right padding-0">
+                    <ul class="pagination pull-right">
+                        <li [ngClass]="{disabled:pager.currentPage === 1}">
+                            <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === 1}">
+                            <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                        </li>
+                        <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                            <a (click)="setPage(page)">{{page}}</a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                            <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                            <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="pull-right">
+                    <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                </div>
+            </nav>
+        </div>
+
+    </div>
+</div>

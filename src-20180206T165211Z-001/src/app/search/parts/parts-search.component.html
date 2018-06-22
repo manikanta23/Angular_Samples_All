@@ -1,0 +1,148 @@
+﻿<!--Nav Start-->
+<div>
+    <div class="row">
+        <div>
+            <div class="search-text-holder">
+                <div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+                    <div class="col-sm-12 col-md-9 col-lg-9 left-area padding-b-25 heading-search" style="background-color:#FFF;">
+                        <div class="title-of-box-hold">
+                            <div class="title-of-box pull-left">Parts Search</div>
+                        </div>
+
+                        <div class="search-holder">
+                            <form #SearchForm="ngForm" class="col-sm-12 col-md-7 col-lg-8">
+                                <div class="col-sm-12 col-md-9 col-lg-9 padding-0">
+                                    <div class="cust-form-holder" *ngIf="!isCustomerSelected">
+                                        <div class="form-group form-inline">
+                                            <label class="sub-title">Customer</label>
+                                            <div class="checkbox">
+                                                <input id="chkCashCustomer" name="chkCashCustomer" #chkCashCustomer value="option" type="checkbox" [(ngModel)]="cashCustomer" (change)="onDefaultCustomerChange($event)">
+                                                <label for="chkCashCustomer"><span><span></span></span> Default Cash Customer</label>
+                                            </div>
+                                        </div>
+                                        <customer-panel #customerPanel [source]="sourceLocationType.PartSearch" (callbackCustomerSelect)="onCustomerSelect($event,customer)" (onCustomerSearchDataChange)="onCustomerSearchCriteriaChange($event,data)"></customer-panel>
+                                    </div>
+
+                                    <!--selected Customer details start-->
+                                    <div class="cust-form-holder" *ngIf="isCustomerSelected">
+                                        <div class="form-group form-inline">
+                                            <label class="sub-title">Customer</label>
+                                        </div>
+                                        <div class="col-sm-12 col-md-6 col-lg-6 padding-0">
+                                            <span *ngIf="customer.customerName!='' && customer.customerName!=' '"><b>{{customer.customerName}}</b><br /></span>
+                                            <span *ngIf="customer.customerName2!='' && customer.customerName2!=' '">{{customer.customerName2}}<br /></span>
+                                            <span *ngIf="customer.customerNumber!='' && customer.customerNumber!=' '">{{customer.customerNumber | customerNumberFilter}}<br /></span>
+                                            <span *ngIf="customer.streetAddress!='' && customer.streetAddress!=' '">{{customer.streetAddress}}<br /></span>
+                                            <span *ngIf="customer.city!='' && customer.city!=' '">{{customer.city}}<br /></span>
+                                            <span *ngIf="(customer.state!=''&& customer.state!=' ') || (customer.postalCode!=''&& customer.postalCode!=' ') || (customer.phoneNumber!=''&& customer.phoneNumber!=' ')">{{customer.state+" "+customer.postalCode +" "+customer.phoneNumber}}</span>
+
+                                        </div>
+                                        <div class="col-sm-12 col-md-6 col-lg-6 padding-0">
+                                            <b>
+                                                <a role="button" class="hyperlink" (click)="addToFavourites(customer);" *ngIf="!customer.isFavourite">Add '{{customer.customerName}}' to Favorites</a>
+                                                <a role="button" class="hyperlink" (click)="removeFavourites(customer);" *ngIf="customer.isFavourite">Remove '{{customer.customerName}}' from Favorites</a>
+                                            </b>
+                                            <br>
+                                            <br>
+                                            <b><a role="button" class="hyperlink" (click)="useDifferentCustomer();">Use a different customer</a></b>
+                                        </div>
+
+                                        <div class="col-md-12 padding-0" style="color:red;padding-top:10px;" id="customerValidForCoupon" *ngIf="hasValidCoupon">
+                                            {{couponMessage}}
+                                        </div>
+                                        <!--<div class="col-md-12 padding-0">
+                                            <br />
+                                            <span [ngClass]="!isshowCouponLoader ? 'redText' : ''">{{couponLoadingMessage}}</span>
+                                            <span class="countLoader" *ngIf="isshowCouponLoader"></span>
+                                        </div>-->
+                                    </div>
+                                    <!--selected Customer details end-->
+                                </div>
+                                <div class="cust-form-holder">
+                                    <div class="form-group form-inline">
+                                        <h5 class="sub-title">Part</h5>
+                                    </div>
+
+                                    <ul class="nav nav-tabs tabs-link-list" role="tablist">
+                                        <li role="presentation" class="active">
+                                            <a href="#pnlPartSearch" role="tab" data-toggle="tab" class="hyperlink" (click)="advCustomerName='';advCity='';advState='';advPostalCode='';advPhoneNumber='';">
+                                                Part name, manufacturer, or keyword
+                                            </a>
+                                        </li>
+                                        <!--<li role="presentation">
+                                            <div class="adv-search-link-container">
+                                                <a href="#pnlPartAdvancedSearch" role="tab" data-toggle="tab" class="hyperlink" (click)="customerNumber ='';">
+                                                    Advanced Part Search
+                                                </a>
+                                            </div>
+                                        </li>-->
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="pnlPartSearch">
+                                            <div class="col-sm-12 col-md-9 col-lg-9 padding-0">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" id="txtSearchTerm" name="txtSearchTerm" #txtSearchTerm [(ngModel)]="searchTerm" (keypress)="onSearchTermKeypress($event)" (keyup)="searchChange()" placeholder="Part number, manufacturer or keyword is required" required>
+
+                                                </div>
+                                                <div [hidden]="!enablePartBuyoutLink" style="margin-top:-4px; margin-bottom:10px; "><a class="right-text-align" style="text-decoration: underline;color: #292929; margin-left:4px" href="#" data-toggle="modal" data-target="#partBuyoutModal" (click)="hideNotification();" data-backdrop="static"><b>Parts Buyout</b></a><br /></div>
+                                            </div>
+                                            <div [hidden]="!enableCreatePartLink" class="pull-left full-width" style=" margin-bottom:10px;">
+                                                <span class="pull-left" style="width:6%"><i class="fa fa-exclamation-circle" style="color:red" aria-hidden="true"></i><label for="createPartLabel" style="padding: 0px 4px;"><span><span></span></span></label></span>
+                                                <span class="pull-left" style="width:94%">There are no search results for part {{searchTerm}} in your branch.<br />Choose another part or attempt to Create Part. Create Part will occur if part exists on a price file.</span>
+                                            </div>
+                                            <button type="button" *ngIf="!enableCreatePartLink" class="btn btn-default yellow-btn btn-width-160" style="margin-top:0px" [disabled]="!SearchForm.form.valid || (!isCustomerSelected && !cashCustomer) || searchTerm.trim()==''" (click)="partSearch();">Search</button>
+                                            <button type="button" *ngIf="enableCreatePartLink" class="btn btn-default yellow-btn btn-width-160" style="margin-top:0px;" (click)="createPart();showCreatePart=false;">
+                                                <span *ngIf="!showCreatePartLoader">Create Part</span>
+                                                <span *ngIf="showCreatePartLoader" style="vertical-align: super;">Processing...</span>
+                                                <span class="countLoader" *ngIf="showCreatePartLoader"></span>
+                                            </button>
+                                        </div>
+
+                                        <div role="tabpanel" class="tab-pane" id="pnlPartAdvancedSearch">
+                                            <p>Provide any of the following information to find part</p>
+                                            <div class="form-group">
+
+                                                <input type="text" class="form-control" id="manufacturer" name="manufacturer" placeholder="Manufacturer">
+
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+                                            </div>
+                                            <div class="form-group form-group pull-left width-100">
+                                                <span id="spanPartValidationMessage" style="color:red;"></span>
+                                            </div>
+                                            <button type="button" class="btn btn-default yellow-btn btn-width-160" [disabled]="!SearchForm.form.valid || (!isCustomerSelected && !cashCustomer)" (click)="partSearch();">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3 padding-b-25 open-cart-container" >
+                        <open-cart-panel #openCartPanel ></open-cart-panel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Cart delete Confarmaction Box Start-->
+<div class="modal fade bs-example-modal-sm" id="deleteConfarmaction" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body customer-table">
+                Cancel all open Customer carts?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default yellow-btn" data-dismiss="modal">Clear All</button>
+                <button type="button" class="btn yellow-btn" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Cart delete Confarmaction Box Start-->
+
+
+<partBuyout-modal #partBuyoutModal></partBuyout-modal>
+<create-part-modal #createPartModal></create-part-modal>

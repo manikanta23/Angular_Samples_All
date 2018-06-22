@@ -1,0 +1,95 @@
+﻿<!--Header Search Start-->
+<div class="col-md-12 search-header-container">
+    <div>
+        <div class="col-sm-12 col-md-5 col-lg-5 customer-name">
+            <div class="col-md-2 padding-0">Customer Name:</div>
+            <div class="dropdown header-customer-search col-md-10" id="ddlHeaderCustomer">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{customerName}}&nbsp;({{customerNumber | customerNumberFilter}}) <span class="caret"></span></a><br />
+                <form class="dropdown-menu">
+                    <div class="checkbox">
+                        <input id="chkCashCustomer" name="chkCashCustomer" #chkCashCustomer value="option" type="checkbox" [(ngModel)]="cashCustomer" (change)="onDefaultCustomerChange($event)">
+                        <label for="chkCashCustomer"><span><span></span></span> Default Cash Customer</label>
+                    </div>
+                    <customer-panel #customerPanel [source]="sourceLocationType.HeaderSearch" (callbackCustomerSelect)="onCustomerSelect($event,customer)" (onCustomerSearchDataChange)="onCustomerSearchCriteriaChange($event,data)"></customer-panel>
+                </form>
+            </div>
+            <span class="padding-0" style="color:red" *ngIf="hasValidCoupon">
+                {{couponMessage}}
+            </span>
+            <div class="col-md-12 padding-0">
+                <span [ngClass]="!isshowCouponLoader ? 'redText' : ''">{{couponLoadingMessage}}</span>
+                <span class="countLoader" *ngIf="isshowCouponLoader"></span>
+            </div>
+        </div>
+        <div class="col-sm-7 col-md-4 col-lg-4 customer-search">
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-filter" aria-hidden="true"></i></span>
+                    <input type="text" class="form-control customer-search-textbox" id="txtSearchTerm" aria-describedby="txtSearchTerm" #txtSearchTerm required [(ngModel)]="searchTerm" (keypress)="onSearchTermKeypress($event)" (keyup)="searchChange()">
+
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                </div>
+                <a role="button" class="hyperlink right-text-align" style="margin-left: 38px !important; position: absolute;" data-toggle="modal" data-target="#partBuyoutModal" (click)="hideNotification();" data-backdrop="static"><span>Parts Buyout</span></a>
+            </div>
+        </div>
+        <div class="col-sm-5 col-md-3 col-lg-3">
+            <a href="#" data-toggle="modal" data-target="#startNewCart" class="switch-cart hyperlink" [ngClass]="{'switchcartdisabled': cartCount<=0}" *ngIf="cartCount>0">Switch Cart</a>
+
+            <div class="cart" (mouseover)='disableScrollBar()' (mouseout)='enableScrollBar()'>
+                <button class="my-cart-btn" role="button" (click)="onMyCartClick();">
+                    My Cart <i class="glyphicon glyphicon-shopping-cart"></i>
+                    <span *ngIf="!showCartLoader">{{cartCount}}</span>
+                    <span class="countLoader" *ngIf="showCartLoader"></span>
+                </button>
+                <!--<cart-check-out-modal [cart-data]="cartsData" *ngIf="cartsData"></cart-check-out-modal>-->
+                <div id="findMyCartClass" class="collapse my-cart-list my-cart">
+                    <div class="well">
+                        <h1>My Cart</h1><span *ngIf="cartsData">{{cartCount}} Items</span>
+                        <div class="cart-product-list" *ngIf="!cartsData || cartsData.length == 0">
+                            <h5>{{cartMessage}}</h5>
+                        </div>
+                        <div class="cart-product-list" *ngIf="cartsData && cartsData.length > 0" style="overflow-y:scroll; height:200px">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Part</th>
+                                        <th>Item</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
+                                        <th width="20px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let cart of cartsData;">
+                                        <td>{{cart.partNumber}}</td>
+                                        <td>
+                                            {{cart.description}}<br />
+                                            <div *ngIf="cart.corePrice>0" class="core-text">{{cart.coreOption == "NOCORER" ? "No Core Returned": "Core Returned"}}</div>
+                                        </td>
+                                        <td class="text-align-right" align="right">{{cart.quantity}}</td>
+                                        <td class="text-align-right" align="right">{{cart.quantity * (cart.finalPrice+(cart.coreOption=="CORE1" || cart.coreOption == null?0: cart.corePrice))==null?"0":cart.quantity * (cart.finalPrice+(cart.coreOption=="CORE1" || cart.coreOption == null ?0: cart.corePrice))|currency:'USD': true:'1.2-2'}}</td>
+                                        <td>
+                                            <a role="button"><i class="fa fa-trash-o" aria-hidden="true" style="color:#000" (click)="removeCartItems(cart);"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="cart-product-total" *ngIf="cartsData && cartsData.length>0">
+                            <div class="row subtotal float-left">
+                                <div class="col-sm-7 col-md-7 col-lg-7">Subtotal</div>
+                                <div class="col-sm-5 col-md-5 col-lg-5">{{calculateCartTotals()|currency:'USD': true:'1.2-2'}}</div>
+                            </div>
+                            <div class="col-md-12 padding-0 order-process-btn">
+                                <button class="black-btn" (click)="onMyCartClick();">Checkout</button>
+                                <!--<a [routerLink]="['cart']">CheckOut</a>-->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Header Search End-->

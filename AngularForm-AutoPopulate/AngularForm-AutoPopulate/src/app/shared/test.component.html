@@ -1,0 +1,12 @@
+
+<h1>test comp</h1>
+<!-- <ngb-alert [dismissible]="false">
+    <strong>Warning!</strong> Better check yourself, you're not looking too good.
+  </ngb-alert> -->
+
+<div class="col-md-3">
+    <label for="typeahead">Search for a state:</label>
+    <input id="typeahead" type="text" class="form-control"  [ngbTypeahead]="search" [inputFormatter]="formatter"  />
+    <hr>
+    <pre>Model: {{ model | json }}</pre>
+  </div>

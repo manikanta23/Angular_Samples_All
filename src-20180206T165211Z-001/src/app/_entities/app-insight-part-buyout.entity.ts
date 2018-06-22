@@ -1,0 +1,22 @@
+﻿export class AppInsightPartBuyout {
+    userId: string = "";
+    customerNumber: string = "";
+    customerName: string = "";
+    branchNumber: string = "";
+    cartNumber: string = "";
+    partId: string = "";
+    partNumber: string = "";
+    vendor: any = null;
+    isDefaultVendor: boolean = false;
+    defaultVendorPartPurchasePrice: number = 0;
+    defaultCustomerPartPurchasePrice: number = 0;
+    defaultVendorCorePurchasePrice: number = 0;
+    defaultCustomerCorePrice: number = 0;
+    vendorPartPurchasePrice: number = 0;
+    customerPartPurchasePrice: number = 0;
+    vendorCorePurchasePrice: number = 0;
+    customerCorePrice: number = 0;
+    quantity: number = 0;
+    quantityAvailable: number = 0;
+    plMetricName: string = "";
+}

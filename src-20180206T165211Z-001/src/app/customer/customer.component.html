@@ -1,0 +1,115 @@
+﻿<ul class="nav nav-tabs tabs-link-list searchpage-tab" role="tablist">
+    <li role="presentation" class="active">
+        <a href="#pnlCustomerSearch" role="tab" data-toggle="tab" class="hyperlink" (click)="advCustomerName='';advCity='';advState='';advPostalCode='';advPhoneNumber='';noRecordFlag=false;">
+            Customer Number
+        </a>
+    </li>
+    <div class="adv-search-link-container"></div>
+    <li role="presentation">
+
+        <a href="#pnlAdvancedCustomerSearch" role="tab" data-toggle="tab" class="hyperlink" (click)="customerNumber ='';noRecordFlag=false;">
+            Advanced Customer Search
+        </a>
+
+    </li>
+    <div class="adv-search-link-container"></div>
+    <li role="presentation">
+        <a class="hyperlink view-favorites" role="button" data-toggle="modal" (click)="viewFavorites()" data-target="#favoritesModal">View favorites</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="pnlCustomerSearch">
+        <div class="form-group">
+            <input type="text" class="form-control" id="txtCustomerNumber" #txtCustomerNumber name="txtCustomerNumber" [(ngModel)]="customerNumber" [required]="!isDefaultCustomerChecked" maxlength="10" (ngModelChange)="change($event)" (keypress)="onCustomerKeypress($event)" (keydown)="onCustomerKeydown($event)" placeholder="Customer number"/> <!--(focusout)="customerSearch()">-->
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <button type="button" style="margin-top:-1px;" class="btn btn-default yellow-btn btn-width-160" (click)="customerSearch()" [disabled]="!customerNumber">Search Customer</button>
+                <label *ngIf="PayerInValidInBranch"> &nbsp; <i class="fa fa-exclamation-triangle warningIcon" aria-hidden="true"></i> Payer is not valid for this branch</label>                
+            </div>           
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="pnlAdvancedCustomerSearch">
+        <div id="sapCustForm">
+            <h5>Provide any of the following information to find customer</h5>
+            <div class="form-group">
+                <input class="form-control" id="advCustomerName" name="advCustomerName" placeholder="Customer Name" type="text" [(ngModel)]="advCustomerName" (ngModelChange)="change($event)" (keypress)="onCustomerNameKeypress($event)">
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advCity" name="advCity" placeholder="City" type="text" [(ngModel)]="advCity" (ngModelChange)="change($event)" (keypress)="onCityKeypress($event)">
+                </div>
+                <div class="form-group col-md-6">
+                    <select class="form-control" id="advState" name="advState" [(ngModel)]="advState" (ngModelChange)="change($event)" (keypress)="onStateKeypress($event)">
+                        <option value="">State</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AZ">Arizona</option>
+                        <option value="AR">Arkansas</option>
+                        <option value="CA">California</option>
+                        <option value="CO">Colorado</option>
+                        <option value="CT">Connecticut</option>
+                        <option value="DE">Delaware</option>
+                        <option value="FL">Florida</option>
+                        <option value="GA">Georgia</option>
+                        <option value="HI">Hawaii</option>
+                        <option value="ID">Idaho</option>
+                        <option value="IL">Illinois</option>
+                        <option value="IN">Indiana</option>
+                        <option value="IA">Iowa</option>
+                        <option value="KS">Kansas</option>
+                        <option value="KY">Kentucky</option>
+                        <option value="LA">Louisiana</option>
+                        <option value="ME">Maine</option>
+                        <option value="MD">Maryland</option>
+                        <option value="MA">Massachusetts</option>
+                        <option value="MI">Michigan</option>
+                        <option value="MN">Minnesota</option>
+                        <option value="MS">Mississippi</option>
+                        <option value="MO">Missouri</option>
+                        <option value="MT">Montana</option>
+                        <option value="NE">Nebraska</option>
+                        <option value="NV">Nevada</option>
+                        <option value="NH">New Hampshire</option>
+                        <option value="NJ">New Jersey</option>
+                        <option value="NM">New Mexico</option>
+                        <option value="NY">New York</option>
+                        <option value="NC">North Carolina</option>
+                        <option value="ND">North Dakota</option>
+                        <option value="OH">Ohio</option>
+                        <option value="OK">Oklahoma</option>
+                        <option value="OR">Oregon</option>
+                        <option value="PA">Pennsylvania</option>
+                        <option value="RI">Rhode Island</option>
+                        <option value="SC">South Carolina</option>
+                        <option value="SD">South Dakota</option>
+                        <option value="TN">Tennessee</option>
+                        <option value="TX">Texas</option>
+                        <option value="UT">Utah</option>
+                        <option value="VT">Vermont</option>
+                        <option value="VA">Virginia</option>
+                        <option value="WA">Washington</option>
+                        <option value="DC">Washington DC</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WY">Wyoming</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advPostalCode" name="advPostalCode" placeholder="Postal Code" type="text" [(ngModel)]="advPostalCode" (ngModelChange)="change($event)" (keypress)="onPostalCodeKeypress($event)">
+                </div>
+                <div class="form-group col-md-6">
+                    <input class="form-control" id="advPhoneNumber" name="advPhoneNumber" placeholder="Phone Number" type="text" [(ngModel)]="advPhoneNumber" (ngModelChange)="change($event)" (keypress)="onPhoneNoKeypress($event)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-12">
+                    <button class="btn btn-default yellow-btn btn-width-160" style="margin-top:-1px;" type="button" id="btnAdvanceCustomerSearch" [disabled]="!advCustomerName && !advCity && !advState && !advPostalCode && !advPhoneNumber" (click)="customerSearch()">Search Customer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<span style="color:red;" id="errorMessage" *ngIf="hasMessage">{{customerMesssage}}</span>

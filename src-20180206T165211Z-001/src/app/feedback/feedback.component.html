@@ -1,0 +1,15 @@
+﻿<div>
+    <br />
+    <div class="form-group">
+        <b>FEEDBACK</b>
+    </div>
+    <div class="form-group">
+        Message<br>
+        <textarea id="txtFeedback" class="form-control" rows="3" maxlength="5000" style="margin: 0px; width:1140px; height: 265px;" [(ngModel)]="feedbackmessage" #message></textarea><br><br>
+        <div class="pull-left">
+            <button type="button" class="btn btn-default yellow-btn btn-width-160 margin-t-10 pull-left margin-r-5" [disabled]="!feedbackmessage" (click)="sendFeedback(message.value)">SUBMIT</button>
+            <button type="button" class="btn btn-default yellow-btn btn-width-160 margin-t-10 pull-left margin-r-5" (click)="cancel()">CANCEL</button>
+        </div>
+    </div>
+</div>
+

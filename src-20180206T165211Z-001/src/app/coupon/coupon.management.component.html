@@ -1,0 +1,114 @@
+﻿<div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+    <div class="col-sm-12 col-md-12 col-lg-12 left-area padding-25 heading-users" style="background-color:#FFF;">
+        <div class="title-of-box-hold">
+            <div class="title-of-box pull-left">
+                Coupon Management
+            </div>
+        </div>
+        <div style="margin:10px 0;" class="col-md-12 ">
+            <div class="input-group col-sm-10 col-md-4 col-lg-4 module-search " *ngIf="couponsPermissions && couponsPermissions.hasReadCouponsPermissions">
+                <input type="text" class="form-control" placeholder="Search ..." [(ngModel)]="filterKey" (keyup)="filter()" />
+                <span class="fa fa-search form-control-feedback" aria-hidden="true" style="margin:8px 10px !important"></span>
+            </div>
+
+            <div class="col-sm-12 col-md-8 col-lg-8 main-text-holder">
+                <a *ngIf="couponsPermissions && couponsPermissions.hasImportCouponsPermissions" role="button" [routerLink]="['/coupon']" class="right-text-align hyperlink" style="margin: 7px 10px 0 0px;">Upload Coupon File</a>
+                <a *ngIf="couponsPermissions && couponsPermissions.hasImportCouponsPermissions" role="button" [routerLink]="['/couponFileImportSummary']" class="hyperlink" style="margin: 7px 10px 0 0px;">Coupon File Import Summary</a>
+                <br />
+            </div>
+        </div>
+        <div class="col-md-12 main-text-holder">
+            <div *ngIf="!couponsPermissions || !couponsPermissions.hasReadCouponsPermissions">
+                <h4>You do not have coupon read permission.</h4>
+            </div>
+            <div class="users-list-table table-responsive">
+                <table class="table" *ngIf="couponData && couponData!=null && couponData!=undefined">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <a role="button">
+                                   Coupon Code
+                                   
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button">
+                                   Part Number
+                                   
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button">
+                                    Coupon Description
+                                   
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button">
+                                   CPDISC                                   
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button">
+                                    BEGDATE
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button">
+                                    ENDDATE
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tr *ngFor="let coupon of pagedCoupons">
+                        <td><span title="Coupon is not valid" *ngIf="coupon.isCouponManagement"> <i class="fa fa-exclamation-triangle warningIcon" aria-hidden="true"></i></span></td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}"> 
+                            {{coupon.couponCode}}                         
+                        </td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}">  
+                            {{coupon.couponSAPPartNumber}}
+                            
+                        </td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}">   
+                            {{coupon.couponDescription}}
+                            
+                        </td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}">   
+                            ${{coupon.couponDiscountFlatAmount}}
+                            
+                        </td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}">{{coupon.couponStartDate | date :  "MM/dd/yy"}} </td>
+                        <td [ngClass]="{'disabledresult':coupon.isCouponManagement}">{{coupon.couponEndDate| date :  "MM/dd/yy"}} </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row" style="padding:15px;">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

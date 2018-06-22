@@ -1,0 +1,131 @@
+﻿ <!--START modal-->
+<div class="modal fade bs-example-modal-md" id="stockTransferModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6 col-lg-6"><h4 class="modal-title" id="exampleModalLabel">National Inventory Search</h4></div>
+                    <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                        <input type="text" id="searchFavouriteId" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search…">
+                        <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </div>
+                <h5 class="row modal-body input-group inventory-search-icon" style="width: 100%;margin-top: 10px;margin-bottom: 10px;" *ngIf="!filteredCartItems">loading national inventory...</h5>
+                <div class="modal-body input-group inventory-search-icon" style="width: 100%; padding:0;" *ngIf="filteredCartItems !=null">
+
+                    <div  *ngIf="filteredCartItems.length>0">
+
+                        <div style="min-height: 200px; max-height: 450px; overflow-y: auto; overflow-x:hidden; width: 100%;">
+                            <div id="divProcurement" style="margin-top: -19px;">
+                                <form #StockTransferOrderForm="ngForm">
+
+                                    <accordion [showArrows]="false" [closeOthers]="true">
+                                        <accordion-group (onToggle)="onToggleAccordion(cartItem)" *ngFor="let cartItem of filteredCartItems;let i=index">
+                                            <accordion-heading>
+                                                <div>
+                                                    <div class="col-sm-1">
+                                                        <accordion-toggle>
+                                                            <i class="fa fa-plus" style="cursor:pointer" *ngIf="!cartItem.isOpened" aria-hidden="true"></i>
+                                                            <i class="fa fa-minus" style="cursor:pointer" *ngIf="cartItem.isOpened" aria-hidden="true"></i>
+                                                        </accordion-toggle>
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <b>Part Number:</b><br />
+                                                        <span>{{cartItem.partNumber}}</span>
+                                                    </div>
+
+                                                    <div class="col-sm-5">
+                                                        <b>Unit Price:</b><br />
+                                                        <!-- <span class="ellipsisText" title="{{cartItem.listPrice}}">{{cartItem.listPrice}}</span><br />-->
+                                                        <div class="redText" *ngIf="cartItem.isSpecialPricing">Special Sale Price</div>
+                                                        <div [ngClass]="cartItem.isSpecialPricing? 'redText':''">
+                                                            <span *ngIf="cartItem.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                                {{cartItem.finalPrice==null?"0":cartItem.finalPrice|currency:'USD': true:'1.2-2'}}<br />
+                                                                <span>orig. {{cartItem.listPrice==null?"0":cartItem.listPrice|currency:'USD': true:'1.2-2'}}</span>
+                                                                <span *ngIf="cartItem.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': cartItem.coreOption == 'CORE1'}" style="width: 70px;">{{cartItem.corePrice==null?"0":cartItem.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                            </span>
+                                                            <span *ngIf="!cartItem.isAdjustedPrice" class="pull-left" style="width: 70px;">
+                                                                {{cartItem.finalPrice==null?"0":cartItem.finalPrice|currency:'USD': true:'1.2-2'}}
+                                                                <span *ngIf="cartItem.corePrice>0" class="pull-left" [ngClass]="{'form-control-removed': cartItem.coreOption == 'CORE1'}" style="width: 70px;">{{cartItem.corePrice==null?"0":cartItem.corePrice|currency:'USD': true:'1.2-2'}}</span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-1">
+                                                        <a role="button" (click)="removeCartItem(cartItem);"><i class="fa fa-times pull-right" style="color:#f72727;" aria-hidden="true"></i></a>
+                                                    </div>
+                                                </div>
+                                            </accordion-heading>
+
+                                            <div class="card-body">
+                                                <div *ngIf="cartItem.filteredInventories && cartItem.filteredInventories.length==0">
+                                                    <h5>None available at any other branches.</h5>
+                                                </div>
+                                                <div class="inventory-search-table" *ngIf="cartItem.filteredInventories && cartItem.filteredInventories.length>0">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>
+                                                                    <a role="button" class="hyperlink" (click)="sortDataBy(cartItem,'branchCode');">
+                                                                        Branch
+                                                                        <span [hidden]="cartItem.sortBy != 'branchCode'" class="fa" [ngClass]="{'fa-caret-up': cartItem.sortBy == 'branchCode' && cartItem.sortAsc, 'fa-caret-down': cartItem.sortBy == 'branchCode' && !cartItem.sortAsc}"> </span>
+                                                                    </a>
+                                                                </th>
+                                                                <th>
+                                                                    <a role="button" class="hyperlink" (click)="sortDataBy(cartItem,'milesFromSource');">
+                                                                        Distance
+                                                                        <span [hidden]="cartItem.sortBy != 'milesFromSource'" class="fa" [ngClass]="{'fa-caret-up': cartItem.sortBy == 'milesFromSource' && cartItem.sortAsc, 'fa-caret-down': cartItem.sortBy == 'milesFromSource' && ! cartItem.sortAsc}"> </span>
+                                                                    </a>
+                                                                </th>
+                                                                <th>
+                                                                    <a role="button" class="hyperlink" (click)="sortDataBy(cartItem,'quantity');">
+                                                                        Inventory
+                                                                        <span [hidden]=" cartItem.sortBy != 'quantity'" class="fa" [ngClass]="{'fa-caret-up':  cartItem.sortBy == 'quantity' &&  cartItem.sortAsc, 'fa-caret-down':  cartItem.sortBy == 'quantity' && ! cartItem.sortAsc}"> </span>
+                                                                    </a>
+                                                                </th>
+                                                                <th>
+                                                                    Quantity
+                                                                </th>
+                                                                <th>
+                                                                    &nbsp;
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let inventory of cartItem.filteredInventories;let j =index">
+                                                                <!--| inventoryFilterPipe:inventoryFilter;-->
+                                                                <td style="width:30%"><b>{{inventory.branchCode +" - "+ inventory.branchName}}</b></td>
+                                                                <td style="width:20%"> {{inventory.milesFromSource}} Miles</td>
+                                                                <td style="width:20%">{{inventory.quantity}}</td>
+                                                                <td style="width:20%">
+                                                                    <div class="input-group spinner">
+                                                                        <div class="range-text-box" style="padding-right: 0%;    width: 100% !important;">
+                                                                            <input class="form-control pull-left right-text-align" type="text" placeholder="Quantity"  id="{{'partsbuyoutQuantity'+(i*10)+j}}" name="{{'partsbuyoutQuantity'+(i*10)+j}}" [(ngModel)]="inventory.partsQuantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity($event,inventory)" autocomplete="off" style="width:70% !important;" (focusout)="onQuantityFocusout(inventory,$event);" />
+                                                                          
+                                                                            <div class="renge-top" (click)="inventory.partsQuantity=inventory.partsQuantity+1">&nbsp;</div>
+                                                                            <div class="renge-down" (click)="inventory.partsQuantity=inventory.partsQuantity>1?inventory.partsQuantity-1:1">&nbsp;</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td style="width:10%">
+                                                                    <button type="submit" class="btn btn-default yellow-btn" (click)="addToCart(inventory,cartItem)">Add to Cart</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </accordion-group>
+                                    </accordion>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+        <!--END modal-->

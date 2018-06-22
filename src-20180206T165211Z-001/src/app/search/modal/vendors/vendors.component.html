@@ -1,0 +1,99 @@
+﻿<!--Search Vendor Module Box Start -->
+<div class="modal fade bs-example-modal-lg" id="vendorsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title pull-left" id="myModalLabel">Vendors</h4>
+                <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                    <input type="text" class="form-control customer-search-textbox" placeholder="Search ..." [(ngModel)]="filterKey" (keyup)="filter()" />
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                </div>
+            </div>
+            <div class="modal-body customer-table">
+                <table class="table ">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a role="button" (click)="sortDataBy('name');">
+                                    Name
+                                    <span [hidden]="sortBy != 'name'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'name' && sortAsc, 'fa-caret-down': sortBy == 'name' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('city');">
+                                    Address
+                                    <span [hidden]="sortBy != 'city'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'city'&& sortAsc, 'fa-caret-down': sortBy == 'city' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('currency');">
+                                    Currency
+                                    <span [hidden]="sortBy != 'currency'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'currency'&& sortAsc, 'fa-caret-down': sortBy == 'currency' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('status');">
+                                    Status
+                                    <span [hidden]="sortBy != 'status'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'status'&& sortAsc, 'fa-caret-down': sortBy == 'status' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('terms');">
+                                    Terms
+                                    <span [hidden]="sortBy != 'terms'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'terms'&& sortAsc, 'fa-caret-down': sortBy == 'terms' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let vendor of pagedAdvancedVendors" (click)="onVendorSelect(vendor);">
+                            <td scope="row">
+                                <span *ngIf="vendor.name!=''">{{vendor.name}}<br /></span>
+                                <span *ngIf="vendor.name2!=''">{{vendor.name2}}<br /></span>
+                                <span *ngIf="vendor.number!=''">{{vendor.number | customerNumberFilter}}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="vendor.address!='' && vendor.address!=' '">{{vendor.address}}<br /></span>
+                                <span *ngIf="(vendor.city!=''&& vendor.city!=' ') || (vendor.state!=''&& vendor.state!=' ') || (vendor.zipCode!=''&& vendor.zipCode!=' ')">{{vendor.city+" , "+vendor.state +" "+vendor.zipCode}}<br /></span>
+                                <span *ngIf="vendor.phone!=''">{{vendor.phone}}</span>
+                            </td>
+                            <td>{{vendor.currency}}</td>
+                            <td>{{vendor.status}}</td>
+                            <td>
+                                <span *ngIf="vendor.terms!=''">{{vendor.terms}}<br /></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Search Vendor Module Box End -->

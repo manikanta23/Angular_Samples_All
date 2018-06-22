@@ -1,0 +1,108 @@
+<p-table [columns]="cols" [value]="cars" selectionMode="single" [(selection)]="selectedCar" (onRowSelect)="onRowSelect($event)" [paginator]="true" rows="10">
+  <ng-template pTemplate="header" let-columns>
+      <tr>
+          <th *ngFor="let col of columns">
+              {{col.header}}
+          </th>
+      </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-columns="columns">
+      <tr [pSelectableRow]="rowData">
+          <td *ngFor="let col of columns">
+              {{rowData[col.field]}}
+          </td>
+      </tr>
+  </ng-template>
+
+  <ng-template pTemplate="summary" let-rowData>
+      <div style="text-align:left">
+          <button type="button" pButton icon="fa-plus" (click)="showDialogToAdd()" label="Add"></button>
+      </div>
+
+      <div class="ui-g-6 ui-md-4">
+        <div class="ui-inputgroup">
+            <button pButton type="button" icon="fa-check" class="ui-button-success"></button>    
+            <input type="text" pInputText placeholder="Vote">   
+            <button pButton type="button" icon="fa-close" class="ui-button-danger"></button>      
+        </div>
+    </div>
+
+
+<!-- <div class="form-group">
+    
+            <label for="name">Name</label>
+            <input id="name" class="form-control"
+                   formControlName="name" required >
+    
+            <div *ngIf="name.invalid && (name.dirty || name.touched)"
+                 class="alert alert-danger">
+    
+              <div *ngIf="name.errors.required">
+                Name is required.
+              </div>
+              <div *ngIf="name.errors.minlength">
+                Name must be at least 4 characters long.
+              </div>
+              <div *ngIf="name.errors.forbiddenName">
+                Name cannot be Bob.
+              </div>
+            </div>
+          </div> -->
+    
+         
+
+  </ng-template>
+
+ 
+  <!-- <p-dropdown [options]="cities1" [(ngModel)]="selectedCity1"></p-dropdown> -->
+</p-table>
+
+<h3 class="first">Single</h3>
+<p-dropdown [options]="cities" [(ngModel)]="selectedCity" placeholder="Select a City" optionLabel="name"></p-dropdown>
+<p>Selected City: {{selectedCity ? selectedCity.name : 'none'}}</p>
+
+
+<div class="ui-g" style="width:250px;margin-bottom:10px">
+    <div class="ui-g-12"><p-checkbox name="group1" value="New York" label="New York" [(ngModel)]="selectedCities" inputId="ny"></p-checkbox></div>
+    <div class="ui-g-12"><p-checkbox name="group1" value="San Francisco" label="San Francisco" [(ngModel)]="selectedCities" inputId="sf"></p-checkbox></div>
+    <div class="ui-g-12"><p-checkbox name="group1" value="Los Angeles" label="Los Angeles" [(ngModel)]="selectedCities" inputId="la"></p-checkbox></div>
+</div>
+
+
+Selected Cities: <span *ngFor="let city of selectedCities" style="margin-right:10px">{{city}}</span>
+
+
+<button class="btn btn-default openBtn" type="button" 
+    pButton label="Open"  (click)="showDialog()">
+</button>
+
+
+
+<app-details [display]="display" (displayChange)="onDialogClose($event)"></app-details>
+
+
+<p-dialog header="Car Details" [(visible)]="displayDialog" [responsive]="true" showEffect="fade" [modal]="true" [closable]="true" [width]="300">
+  <div class="ui-g ui-fluid" *ngIf="car">
+      <div class="ui-g-4"><label for="vin">Vin</label></div>
+      <div class="ui-g-8"><input pInputText id="vin" [(ngModel)]="car.vin" /></div>
+      
+      <div class="ui-g-4"><label for="year">Year</label></div>
+      <div class="ui-g-8"><input pInputText id="year" [(ngModel)]="car.year" /></div>
+      
+      <div class="ui-g-4"><label for="brand">Brand</label></div>
+      <div class="ui-g-8"><input pInputText id="brand" [(ngModel)]="car.brand" /></div>
+      
+      <div class="ui-g-4"><label for="color">Color</label></div>
+      <div class="ui-g-8"><input pInputText id="color" [(ngModel)]="car.color" /></div>
+  </div>
+  <p-footer>
+      <div class="ui-dialog-buttonpane ui-helper-clearfix">
+          <button type="button" pButton icon="fa-close" (click)="delete()" label="Delete"></button>
+          <button type="button" pButton icon="fa-check" (click)="save()" label="Save"></button>
+      </div>
+  </p-footer>
+</p-dialog>
+
+<!-- 
+<p-dropdown [options]="cities" [(ngModel)]="selectedCity" placeholder="Select a City" optionLabel="name"></p-dropdown>
+<p>Selected City: {{selectedCity ? selectedCity.name : 'none'}}</p> -->

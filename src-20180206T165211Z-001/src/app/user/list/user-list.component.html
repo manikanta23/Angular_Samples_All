@@ -1,0 +1,100 @@
+﻿<div class="col-sm-12 col-md-12 col-lg-12 padding-0">
+    <div class="col-sm-12 col-md-12 col-lg-12 left-area padding-25 heading-users" style="background-color:#FFF;">
+        <div class="title-of-box-hold">
+            <div class="title-of-box pull-left">
+                Users
+            </div>
+        </div>
+        <div style="margin:10px 0;">
+            <div class="col-sm-10 col-md-4 col-lg-4">
+                <input type="text" class="form-control" placeholder="Search ..." [(ngModel)]="filterKey" (keyup)="filter()" />
+                <span class="fa fa-search form-control-feedback" aria-hidden="true" style="margin:8px 10px !important"></span>
+            </div>
+
+            <div class=" col-sm-12 col-md-8 col-lg-8 main-text-holder right-text-align">
+                <a role="button" (click)="createUser()" class="right-text-align hyperlink" style="margin: 7px 0 0; float: right;">Add User</a>
+                <br />
+            </div>
+        </div>
+        <div class="col-md-12 main-text-holder">
+            
+            <div class="users-list-table table-responsive">
+                <table class="table" *ngIf="usersData && usersData!=null && usersData!=undefined">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a role="button" (click)="sortDataBy('userName');">
+                                    User Name
+                                    <span [hidden]="sortBy != 'userName'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'userName' && sortAsc, 'fa-caret-down': sortBy == 'userName' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('lastName');">
+                                    Display Name
+                                    <span [hidden]="sortBy != 'lastName'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'lastName'&& sortAsc, 'fa-caret-down': sortBy == 'lastName' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('emailAddress');">
+                                    Email Address
+                                    <span [hidden]="sortBy != 'emailAddress'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'emailAddress'&& sortAsc, 'fa-caret-down': sortBy == 'emailAddress' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('defaultBranchCode');">
+                                    Default Branch Code
+                                    <span [hidden]="sortBy != 'defaultBranchCode'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'defaultBranchCode'&& sortAsc, 'fa-caret-down': sortBy == 'defaultBranchCode' && !sortAsc}"> </span>
+                                </a></th>
+                        </tr>
+                    </thead>
+                    <tr *ngFor="let user of pagedUsers">
+                        <td>
+                            <a class="hyperlink" role="button" (click)="loadUserDetail(user.id)">{{user.userName}}</a>                            
+                        </td>
+                        <td>
+                            {{user.lastName}}, {{user.firstName}}
+                        </td>
+                        <td>
+                            {{user.emailAddress}}
+                        </td>
+                        <td>
+                            {{user.defaultBranchCode}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row" style="padding:15px;">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Popup -->
+<div class="modal fade bs-example-modal-lg" id="userDetailModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <user-details></user-details>
+</div>
+<!-- end User Details Popup -->

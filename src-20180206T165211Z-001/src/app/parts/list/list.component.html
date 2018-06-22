@@ -1,0 +1,175 @@
+﻿ <!--Nav Start-->
+<div>
+    <div class="row" tabindex="-1">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="col-sm-6 col-md-9 col-lg-9 padding-l-5">
+                <ol class="breadcrumb" tabindex="-1">
+                    <li tabindex="-1"><a href="#" [routerLink]="['/']" tabindex="-1">Home</a></li>
+                    <li tabindex="-1"><a href="#" tabindex="-1">Search</a></li>
+                    <li tabindex="-1" class="active">Search Results</li>
+                </ol>
+            </div>
+            <div class="col-sm-6 col-md-3 col-lg-3 pull-right page-count-dropdown">
+                <!--TODO: Phase 2-->
+                <!--<label class="pull-left">Show Per Page:</label>
+                <select class="form-control pull-right">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                    <option>40</option>
+                    <option>50</option>
+                </select>-->
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="main-text-holder">
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                <div class="left-area">
+                    <h1>Refine Search</h1>
+                    <div class="left-text">
+                        <h2>Manufacturers</h2>
+                        <input type="text" class="form-control" placeholder="Enter Manufacturers" [(ngModel)]="manufacturerFilter">
+                        <div tabindex="-1" *ngIf="partsData.facets!=null && partsData.facets.manufacturer.buckets!=null">
+                            <div tabindex="-1" class="checkbox" *ngFor="let manufacturer of partsData.facets.manufacturer.buckets | manufacturerFilterPipe:manufacturerFilter; let i=index">
+                                <input tabindex="-1" id="{{ 'manufacturer_' + i }}" type="checkbox" name="field" value="option" [(ngModel)]="manufacturer.selected" (change)="onFacetChange(manufacturer.val,'Manufacturer',manufacturer.selected,partsData.facets)">
+                                <label tabindex="-1" for="{{ 'manufacturer_' + i }}"><span><span></span></span> {{manufacturer.val!=''? manufacturer.val:'Other'}} ({{manufacturer.count}})</label>
+
+                            </div>
+                        </div>
+                        <hr>
+                        <h2>Category</h2>
+                        <div tabindex="-1" style="margin-top:-5px; display:block;" *ngIf="partsData.facets!=null && partsData.facets.category.buckets!=null">
+                            <div tabindex="-1" class="checkbox" *ngFor="let category of partsData.facets.category.buckets ; let i=index">
+                                <input tabindex="-1" id="{{ 'category_' + i }}" type="checkbox" name="field" value="option" [(ngModel)]="category.selected" (change)="onFacetChange(category.val,'Category',category.selected,partsData.facets)">
+                                <label tabindex="-1" for="{{ 'category_' + i }}"><span><span></span></span>{{category.val!=''? category.val:'Other'}} ({{category.count}})</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-9 col-lg-9 reset-right-area-left-padding">
+                <div class="right-area">
+                    <div class="title-of-box-hold">
+                        <div class="title-of-box pull-left">{{partsData.totalParts}} parts found for <span class="yellow-text">{{"\""+searchTerm+"\""}}</span></div>
+
+                        <!--TODO: Phase 2-->
+                        <!--<div class="title-of-sort pull-right">
+                            <li class="dropdown">
+                                Sort by <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{partsSortDirection}} &nbsp;<span class="fa" [ngClass]="{'fa-caret-up': sortAsc, 'fa-caret-down': !sortAsc}"></span></a>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a role="button" (click)="sortDataBy('listPrice', true);">Price Low to High</a></li>
+                                    <li><a role="button" (click)="sortDataBy('listPrice', false);">Price High to Low</a></li>
+                                </ul>
+                            </li>
+                        </div>-->
+                    </div>
+
+                    <div class="right-area-text">
+
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                <div class="col-sm-10 col-md-10 col-lg-10 pull-left filter-results">
+                                    <!--<p>Filters:</p> <span *ngFor="let refine of selectedFacetArray">{{refine.facetText}} <i class="fa fa-times" aria-hidden="true"></i></span>  <a *ngIf="selectedFacetArray && selectedFacetArray.length>0"> Clear</a>-->
+
+                                    <p>Filters:</p> <span *ngIf="selectedFacetArray.length==0"> No filters applied</span><span *ngFor="let refine of selectedFacetArray">{{refine.facetText!=''? refine.facetText :'Other'}} </span>
+
+                                </div>
+                                <!--<div class="col-sm-2 col-md-2 col-lg-2 filter-sort-btn">
+                                    <a role="button" class="pull-right active"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                                    <a role="button" class="pull-right"><i class="fa fa-th-large" aria-hidden="true"></i></a>
+                                </div>-->
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <ul class="col-sm-12 col-md-12 col-lg-12 product-view-list product-view-list-over">
+                                <!--list-view-product-card Start-->
+                                <li class="product-card" [ngClass]="part.quantityAvailable == 0? 'disabled-card': ''" *ngFor="let part of partsData.parts">
+                                    <div class="col-sm-12 col-md-4 col-lg-4 padding-0 product-card-text">
+                                        <h1>
+                                            <a [routerLink]="['/parts']" [queryParams]="{searchTerm:part.rushPartNumber,partId:part.partId, src: sourceLocationType.PartListResult}">
+                                                {{part.rushPartNumber}}
+                                            </a>
+                                            <a class="upload-icon" style="cursor:pointer" (click)="copyToClipBoard(part.rushPartNumber)"></a>
+                                        </h1>
+                                        <div class="product-images" tabindex="-1">
+                                            <a [routerLink]="['parts']" [queryParams]="{searchTerm:part.rushPartNumber,partId:part.partId, src: sourceLocationType.PartListResult}" tabindex="-1">
+                                                <img [src]="imageBaseUrl +'100X100/'+ part.image"
+                                                     [default]="defaultImage" tabindex="-1"
+                                                     alt="Smiley face" height="100px" width="100px" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-5 col-lg-5 product-view-list-col2 product-card-text">
+                                        <div class="available"><b>{{part.quantityAvailable}} Available</b> - {{branchCode + ' - ' + part.branchName}}</div>
+                                        <div class="grid-product-text">
+                                            <ul>
+                                                <li>
+                                                    <div class="text-div">
+                                                        <b>VMRS Description</b>
+                                                        <p class="ellipsisText" title="{{part.vmrsDescription}}">{{part.vmrsDescription}}</p>
+                                                    </div>
+                                                    <div class="text-div">
+                                                        <b>VMRS Code</b>
+                                                        <p>{{part.vmrsCode}}</p>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="text-div" *ngIf="part.corePart!='' && part.corePart!=null">
+                                                        <b>Core No.</b>
+                                                        <p>{{part.corePart}}</p>
+                                                    </div>
+                                                    <div class="text-div">
+                                                        <b>Item Summary</b>
+                                                        <p>{{part.description}}</p>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-sm-12 col-md-3 col-lg-3 product-view-list-col3 product-card-text" [ngClass]="(part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)) && (part.corePrice != null && part.corePrice >= 0) ? 'couponPrice':''">
+                                        <div class="product-price">
+                                            <div style="width:125px; margin:0 auto;">
+                                                <b>CUSTOMER'S PRICE</b>
+                                                <div class="redText" *ngIf="part.isSpecialPricing">Special Sale Price</div>
+                                                <span [ngClass]="part.isSpecialPricing? 'redText':''">
+                                                    {{part.listPrice == null ? "0" : part.listPrice | currency:'USD': true:'1.2-2'}}<i class="fa fa-ticket coupon" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)" title="Part is eligible for coupon"></i>
+                                                </span>
+                                                
+                                                <div [ngClass]="{'hidden-visibility': (part.corePrice == null || part.corePrice <= 0)}"> 
+                                                    <b class="disable">CORE PRICE</b>
+                                                    <span class="disable">{{part.corePrice == null ? "0" : part.corePrice | currency:'USD': true:'1.2-2'}}</span>
+                                                </div>
+                                                <div class="couponRedTextListPage" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)">
+                                                    <p class="ellipsisText" title="{{part.couponPartDetails[0].couponDescription}}">
+                                                        {{part.couponPartDetails[0].couponDescription}}
+                                                    </p>
+                                                    <b class="redText">COUPON PRICE</b>
+                                                    <span class="redText">
+                                                        {{part.couponPartDetails[0].couponDiscountFlatAmount | currency:'USD': true:'1.2-2'}}
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ToDo: national inventory url/href need to correct. -->
+                                    <div class="national-inventory">
+                                        <!--<a class="hyperlink" href="#" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">National Inventory</a>-->
+                                        <a role="button" class="hyperlink" (click)="openNationalInventory(part)">National Inventory</a>
+                                    </div>
+                                </li>
+                                <!--list-view-product-card End-->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

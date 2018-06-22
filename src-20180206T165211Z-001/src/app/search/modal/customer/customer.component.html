@@ -1,0 +1,121 @@
+﻿<!--Search Customer Module Box Start -->
+<div class="modal fade bs-example-modal-lg" id="customersModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title pull-left" id="myModalLabel">Customer</h4>
+                <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                    <!--<input type="text" class="form-control customer-search-textbox" placeholder="Search ..." [(ngModel)]="customerFilterQuery" />-->
+                    <input type="text" class="form-control customer-search-textbox" placeholder="Search ..." [(ngModel)]="filterKey" (keyup)="filter()" />
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                </div>
+
+                <!--<input class="form-control pull-right col-sm-12 col-md-6 col-lg-6" id="exampleInputEmail1" type="Search" style="width:25%; float:right">-->
+            </div>
+            <div class="modal-body customer-table">
+                <table class="table ">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('customerName');">
+                                    Name
+                                    <span [hidden]="sortBy != 'customerName'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'customerName' && sortAsc, 'fa-caret-down': sortBy == 'customerName' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th>
+                                <a role="button" (click)="sortDataBy('city');">
+                                    Address
+                                    <span [hidden]="sortBy != 'city'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'city'&& sortAsc, 'fa-caret-down': sortBy == 'city' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('orderCount');">
+                                    Total Orders
+                                    <span [hidden]="sortBy != 'orderCount'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'orderCount'&& sortAsc, 'fa-caret-down': sortBy == 'orderCount' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('mostRecentOrderDate');">
+                                    Most recent Order
+                                    <span [hidden]="sortBy != 'mostRecentOrderDate'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'mostRecentOrderDate'&& sortAsc, 'fa-caret-down': sortBy == 'mostRecentOrderDate' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('accountManager');">
+                                    Salesperson#
+                                    <span [hidden]="sortBy != 'accountManager'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'accountManager'&& sortAsc, 'fa-caret-down': sortBy == 'accountManager' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+                            <th style="white-space: nowrap">
+                                <a role="button" (click)="sortDataBy('mscAccountNumber');">
+                                    MSC Acct#
+                                    <span [hidden]="sortBy != 'mscAccountNumber'" class="fa" [ngClass]="{'fa-caret-up': sortBy == 'mscAccountNumber'&& sortAsc, 'fa-caret-down': sortBy == 'mscAccountNumber' && !sortAsc}"> </span>
+                                </a>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let customer of pagedAdvancedCustomers" [ngClass]="{'disabledresult':customer.payerNotValidInBranch}" (click)="onCustomerSelect(customer);">
+
+                            <td><span title="Payer is not valid for this branch" *ngIf="customer.payerNotValidInBranch"> <i class="fa fa-exclamation-triangle warningIcon" aria-hidden="true"></i></span></td>
+
+                            <!--| customerFilter :customerFilterQuery-->
+                            <td scope="row">
+                                <span *ngIf="customer.customerName!=''">{{customer.customerName}}<br /></span>
+                                <span *ngIf="customer.customerName2!=''">{{customer.customerName2}}<br /></span>
+                                <span *ngIf="customer.customerNumber!=''">{{customer.customerNumber | customerNumberFilter}}</span>
+                            </td>
+                            <td>
+                                <span *ngIf="customer.streetAddress!='' && customer.streetAddress!=' '">{{customer.streetAddress}}<br /></span>
+                                <span *ngIf="(customer.city!=''&& customer.city!=' ') || (customer.state!=''&& customer.state!=' ') || (customer.postalCode!=''&& customer.postalCode!=' ')">{{customer.city+" , "+customer.state +" "+customer.postalCode}}<br /></span>
+                                <span *ngIf="customer.phoneNumber!=''">{{customer.phoneNumber}}</span>
+                            </td>
+                            <td>{{customer.orderCount}}</td>
+                            <td>{{customer.mostRecentOrderDate| date: 'dd/MM/yyyy'}}</td>
+                            <td>
+                                <span *ngIf="customer.accountManagerName!=''">{{customer.accountManagerName}}<br /></span>
+                                <span *ngIf="customer.accountManager!=''">{{customer.accountManager}}</span>
+                            </td>
+                            <td>{{customer.mscAccountNumber}}</td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+                <table>
+                    <tr><td><br /><span>Note : The symbol (<i class="fa fa-exclamation-triangle warningIcon" aria-hidden="true"></i>) represents that payer number is invalid in this branch.</span></td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Search Customer Module Box End -->

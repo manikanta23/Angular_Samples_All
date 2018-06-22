@@ -1,0 +1,79 @@
+﻿<div class="open-cart">
+    <div class="title-of-box-hold">
+        <div class="title-of-box pull-left" *ngIf="!filterByCustomer">Open Carts</div>
+        <div class="title-of-box pull-left" *ngIf="filterByCustomer">Open Carts - Customer# {{selectedCustomerNumber}}</div>
+    </div>
+    <div class="form-group" style="margin: 0 10px 15px;" *ngIf="showOpenCartLoader">
+        loading open carts...
+        <span class="countLoader"></span>
+    </div>
+    <div *ngIf="(openCarts== null || openCarts == undefined || openCarts.length < 1) && !showOpenCartLoader"><h5 class="col-xs-12"> No records found.</h5></div>
+    <div *ngIf="openCarts!= null && openCarts != undefined && openCarts.length > 0" style="padding: 0 10px 10px;">
+
+        <div style="margin:10px auto;">
+            <div class="checkbox">
+                <input id="chkSearchCustomerFilter" name="chkSearchCustomerFilter" #chkSearchCustomerFilter value="filterByCustomer" type="checkbox" [(ngModel)]="filterByCustomer" (change)="filterCart()">
+                <label for="chkSearchCustomerFilter"><span><span></span></span> Search Customer</label>
+            </div>
+
+            <div class="checkbox">
+                <input id="chkSearchBranchFilter" name="chkSearchBranchFilter" #chkSearchBranchFilter value="filterByBranch" type="checkbox" [(ngModel)]="filterByBranch" (change)="filterCart()">
+                <label for="chkSearchBranchFilter"><span><span></span></span> Search Branch</label>
+            </div>
+        </div>
+
+        <div class="open-cart-items-container">
+            <div *ngFor="let cart of pagedOpenCarts" class="row open-cart-details pull-left" (click)="goToCart(cart)">
+                <div class="form-group">
+                    <div class="input-group">
+
+                        <div class="input-group-addon">
+                            <div class="cart-icon-div">
+                                <i class="glyphicon glyphicon-shopping-cart"></i>
+                                <span>{{cart.cartItemCount}}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <b>Customer Number:</b> {{cart.customerNumber | customerNumberFilter}}
+                            <br />
+                            <b>Quote Number:</b> {{cart.quote}}
+                            <br />
+                            <b>Price:</b> {{cart.price == null ? "0" : cart.price | currency:'USD': true:'1.2-2'}}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length" class="pagination-nav">
+                <div style="text-align: center;display: inline-block;">
+                    <!-- <div class="pull-right padding-0"> -->
+                    <div style="display: inline-block;">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                    <ul class="pagination pad-l-20">
+                        <li [ngClass]="{disabled:pager.currentPage === 1}">
+                            <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === 1}">
+                            <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                        </li>
+                        <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                            <a (click)="setPage(page)">{{page}}</a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                            <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                        </li>
+                        <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                            <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
+        </div>
+    </div>
+
+</div>

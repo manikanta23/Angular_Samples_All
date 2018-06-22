@@ -1,0 +1,65 @@
+﻿<!--Favorites Modal Box Start -->
+<div class="modal fade bs-example-modal-lg" id="favoriteVendorsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" style="z-index: 9997;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title pull-left" id="myModalLabel">Favorite Vendors</h4>
+                <div class="input-group col-sm-12 col-md-6 col-lg-6 module-search">
+                    <!--<input type="text" class="form-control customer-search-textbox" placeholder="Search ..." [(ngModel)]="favouritesFilterQuery" />-->
+                    <input type="text" class="form-control customer-search-textbox" [(ngModel)]=filterKey (keyup)="filter()" placeholder="Search Your Favorite Vendors…">
+                    <span class="fa fa-search form-control-feedback" aria-hidden="true"></span>
+                </div>
+            </div>
+            <div class="modal-body padding-0" *ngIf="!favouriteVendors">
+                <h5>loading favorite vendor(s) ...</h5>
+            </div>
+            <div class="modal-body padding-0" *ngIf="favouriteVendors">
+                <div *ngIf="favouriteVendors.length < 1"><h5 class="col-xs-12"> No records found.</h5></div>
+                <div *ngIf="favouriteVendors.length > 0" class="favorites-customer-list">
+                    <div class="col-sm-12 col-md-4 col-lg-4" *ngFor="let favourite of pagedFavouriteVendors">
+                        <!--| favouritesFilter :favouritesFilterQuery-->
+                        <button type="button" class="close" (click)="removeFavouriteVendors(favourite);"><span aria-hidden="true" class="fa fa-trash-o favourite-delete"></span></button>
+                        <div class="list-grid" (click)="onSelectFavouriteVendor(favourite);">
+                            <div style="min-height: 108px;">
+                                <b class="ellipsisText" title="{{favourite.name}}">{{favourite.name}}</b>
+                                <span class="ellipsisText" title="{{favourite.name2}}" *ngIf="favourite.name2!='' && favourite.name2!=' '">{{favourite.name2}}<br /></span>
+                                <span *ngIf="favourite.number!='' && favourite.number!=' '">{{favourite.number | customerNumberFilter}}<br /></span>
+                                <span class="ellipsisText" title="{{favourite.address}}" *ngIf="favourite.address!='' && favourite.address!=' '">{{favourite.address}}<br /></span>
+                                <span class="ellipsisText" title="{{favourite.city==null?'': favourite.city+','}} {{favourite.state}} {{favourite.zipCode}}" *ngIf="(favourite.city!='' && favourite.city!=' ') || (favourite.state!='' && favourite.state!=' ') || (favourite.zipCode!='' && favourite.zipCode!=' ')">{{favourite.city==null?'': favourite.city+','}} {{favourite.state}} {{favourite.zipCode}}<br /></span>
+                                <span *ngIf="favourite.phone!='' && favourite.phone!=' '">{{favourite.phone}}<br /></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+                    <div class="pull-right padding-0">
+                        <ul class="pagination pull-right">
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="First" (click)="setPage(1)"><span aria-hidden="true">&laquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                            </li>
+                            <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                <a (click)="setPage(page)">{{page}}</a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                            </li>
+                            <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                <a aria-label="Last" (click)="setPage(pager.totalPages)"><span aria-hidden="true">&raquo;</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pull-right">
+                        <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Favorites Modal Box End -->

@@ -1,0 +1,25 @@
+﻿<div class="branch-conteiner-search">
+    <div class="branch">
+        <h5 class="modal-body input-group inventory-search-icon" style="width: 100%;margin-top: 10px;margin-bottom: 10px;" *ngIf="!branches">loading branches ...</h5>
+    </div>
+        <div class="branch" [hidden]="!branches">
+            <form class="form-horizontal" [formGroup]="myForm">
+                <input #branch id="branch" name="branch"
+                       ng2-auto-complete
+                       formControlName="branch"
+                       [source]="branches"
+                       [list-formatter]="autocompleListFormatter"
+                       value-property-name="code"
+                       display-property-name="name"
+                       placeholder="Find My Branch"
+                       min-chars="1"
+                       no-match-found-text="no branch found."
+                       (valueChanged)="onBranchValueChange($event)"
+                       loading-text="loading branches ..."
+                       class="form-control"
+                       max-num-list="15"
+                       (focusout)="onBranchFocusoutEvent();" 
+                       (focus)="selectAllContent($event)"/>
+            </form>
+        </div>
+    </div>

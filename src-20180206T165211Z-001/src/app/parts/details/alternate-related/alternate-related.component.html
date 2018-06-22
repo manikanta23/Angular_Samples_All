@@ -1,0 +1,114 @@
+<div class="related-product-title">
+    <div class="col-sm-12 col-md-5 col-lg-5 related-alternate-parts-pagination">
+        <nav aria-label="Page navigation" *ngIf="pager.pages && pager.pages.length">
+            <div class="pull-right padding-0">
+                <ul class="pagination pull-right">
+                    <li [ngClass]="{disabled:pager.currentPage === 1}">
+                        <a aria-label="Previous" (click)="setPage(pager.currentPage - 1)"><span aria-hidden="true">&lsaquo;</span></a>
+                    </li>
+                    <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                        <a (click)="setPage(page)">{{page}}</a>
+                    </li>
+                    <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                        <a aria-label="Next" (click)="setPage(pager.currentPage + 1)"><span aria-hidden="true">&rsaquo;</span></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="pull-right">
+                <span class="pagination-result">Showing {{pager.startIndex + 1}} - {{pager.endIndex + 1}} of {{pager.totalItems}} Results</span>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="col-sm-12 col-md-12 col-lg-12">
+    <div class="col-sm-12 col-md-3 col-lg-3 main-text-holder" *ngFor="let part of pagedAlternateRelatedParts">
+        <!--partsData.parts-->
+        <div class="relared-product-card right-area">
+            <div class="product-view-grid">
+                <!--grid-view-product-card Start-->
+                <div class="product-card" [ngClass]="part.quantityAvailable == 0? 'disabled-card': ''">
+                    <h1>
+                        <a class="ellipsisText ellipse-inline" title="{{part.rushPartNumber}}" [routerLink]="['/parts']" [queryParams]="{searchTerm:part.rushPartNumber,partId:part.partId, src:source}">
+                            {{part.rushPartNumber}}
+                        </a>
+
+                        <a class="upload-icon" style="cursor:pointer" (click)="copyToClipBoard(part.rushPartNumber)"></a>
+                    </h1>
+                    <div class="product-card-text">
+                        <div class="available" [ngClass]="{'available-relevance': isRelatedFlag}"><b>{{part.quantityAvailable}}</b><b> Available</b> - {{branchCode + '- ' + part.branchName}}</div>
+                        <div *ngIf="isRelatedFlag" class="chart-container">
+                            <chart [options]="part.chartOptions" style="width:25px;height:25px;display: inline-block;"></chart>
+                            <span class="relevance-text-container">
+                                <span class="relevance-percent">
+                                    {{part.confidence | number:'1.0-0'}}%
+                                </span>
+                                also purchased this product
+                            </span>
+                        </div>
+                        <div class="product-images" tabindex="-1">
+                            <a [routerLink]="['/parts']" [queryParams]="{searchTerm:part.rushPartNumber,partId:part.partId, src:source}" tabindex="-1">
+                                <img [src]="imageBaseUrl +'100X100/'+ part.image"
+                                     [default]="defaultImage"
+                                     alt="Smiley face" height="100px" width="100px" tabindex="-1" />
+                            </a>
+                        </div>
+                        <div class="product-price"
+                            [ngClass]="{'couponPrice-product-price': part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)}">
+                            <b>CUSTOMER'S PRICE</b>
+                            <div class="redText" *ngIf="part.isSpecialPricing">Special Sale Price</div>
+                            <span [ngClass]="part.isSpecialPricing? 'redText':''">
+                                {{part.listPrice == null ? "0" : part.listPrice | currency:'USD': true:'1.2-2'}}
+                                <i class="fa fa-ticket coupon" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)" title="Part is eligible for coupon"></i>
+                            </span>
+
+                            <!--<b style="color:red">Customer Qualifies for discount</b>-->
+                            <div [ngClass]="{'hidden-visibility': (part.corePrice == null || part.corePrice <= 0)}">
+                                <b class="disable">CORE PRICE</b>
+                                <span class="disable">{{part.corePrice == null ? "0" : part.corePrice | currency:'USD': true:'1.2-2'}}</span>
+                            </div>
+                            <div class="couponRedText" *ngIf="part.hasCoupon || (part.couponPartDetails != undefined && part.couponPartDetails != null && part.couponPartDetails.length > 0)">
+                                <p class="ellipsisText" title="{{part.couponPartDetails[0].couponDescription}}">
+                                    {{part.couponPartDetails[0].couponDescription}}
+                                </p>
+                                <b class="couponRedText">COUPON PRICE</b>
+                                <span class="couponRedText">
+                                    {{part.couponPartDetails[0].couponDiscountFlatAmount | currency:'USD': true:'1.2-2'}}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <select *ngIf="part.corePrice>0" class="form-control pull-right" #alternaterelatedCoreOption style="width: 60%; margin: 0 5px 5px auto;" (change)="alternaterelatedCoreOptionChange(alternaterelatedCoreOption.value)">
+                                <option value="NOCORER">No Core Returned</option>
+                                <option value="CORE1">Core Returned</option>
+                            </select>
+                        </div>
+                        <div class="product-description ellipsisText">
+                            <!--<span class="relevance-percentage">{{part.confidence}}%</span><br />-->
+                            <b title="{{part.manufacturer}}">{{part.manufacturer}}</b>
+                            <br><span title="{{part.description}}">{{part.description}}</span>
+                        </div>
+
+                        <div class="product-quantity">
+                            <label>Quantity</label>
+                            <div class="range-text-box">
+                                <input class="form-control pull-left right-text-align" type="text" [(ngModel)]="part.quantity" (keypress)="_keyPress($event)" (keyup)="changeQuntity(part,$event)" (focusout)="onQuantityFocusout(part,$event);" />
+                                <div class="renge-top" (click)="part.quantity=(part.quantity *1)+1">&nbsp;</div>
+                                <div class="renge-down" (click)="part.quantity=(part.quantity*1)>1?(part.quantity*1)-1:1">&nbsp;</div>
+                            </div>
+                        </div>
+
+                        <div class="product-add-to-cart-btn">
+                            <button type="button" class="btn btn-primary yellow-btn btn-sm pull-right" (click)="addToCart(part)">{{part.quantityAvailable > 0 ? "Add to Cart" : "Order"}}</button>
+                        </div>
+                        <div class="national-inventory">
+                            <!--<a class="hyperlink" href="#">National Inventory</a>-->
+                            <a role="button" class="hyperlink margin-t-10" (click)="openNationalInventory(part)">National Inventory</a>
+                        </div>
+                    </div>
+                </div>
+                <!--grid-view-product-card End-->
+            </div>
+        </div>
+    </div>
+</div>
